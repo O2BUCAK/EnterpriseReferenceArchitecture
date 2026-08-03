@@ -1,0 +1,22 @@
+# Güvenlik ve Şifreler
+.env
+*.pem
+*.key
+*.p12
+*.cer
+secrets.yml
+ipa-passwords.txt
+
+# Altyapı ve Durum (State) Dosyaları
+*.tfstate
+*.tfstate.backup
+.terraform/
+.vagrant/
+
+# İşletim Sistemi ve Geçici Dosyalar
+.DS_Store
+Thumbs.db
+.bash_history
+
+# Loglar
+*.log
