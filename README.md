@@ -16,10 +16,10 @@ Bu proje; bir şirketin tüm IT, Kimlik Yönetimi (IAM), Sır Yönetimi (Secret 
 
 1. **Zero Plaintext (Sıfır Düz Metin Şifre):** Hiçbir konfigürasyon dosyasında veya kod içinde şifre tutulmaz. Tüm şifreler, sertifikalar ve API token'ları **OpenBao (Vault)** üzerinden dinamik çekilir.
 2. **Merkezi Kimlik ve Erişim Yönetimi (IAM & SSO):**
-   * **Active Directory Domain:** `corp.ozbucak.com.tr` (FreeIPA / Red Hat IdM).
+   * **Active Directory Domain:** `corp.example.com` (FreeIPA / Red Hat IdM).
    * **Web SSO / OIDC:** Keycloak (FreeIPA LDAP entegrasyonu ile).
    * **PAM / SSH Bastion:** Teleport CE (Kısa ömürlü sertifika tabanlı erişim).
-3. **Merkezi Veritabanı Mimarisi:** Tüm servislerin (Nextcloud, Keycloak, Netbox, Wazuh, Zabbix vb.) veritabanı ihtiyacı **Pardus Serverüzerindeki merkezi PostgreSQL** sunucusundan karşılanır.
+3. **Merkezi Veritabanı Mimarisi:** Tüm servislerin (Nextcloud, Keycloak, Netbox, Wazuh, Zabbix vb.) veritabanı ihtiyacı **Pardus Server üzerindeki merkezi PostgreSQL** sunucusundan karşılanır.
 4. **Kurumsal İsimlendirme Standartları:**
    * **Uygulama Servis Hesapları (AD):** `x_sa` *(Örn: keycloak_sa)*
    * **Uygulama Veritabanları (DB):** `x_db` *(Örn: netbox_db)*
@@ -55,11 +55,11 @@ Bu proje; bir şirketin tüm IT, Kimlik Yönetimi (IAM), Sır Yönetimi (Secret 
 ===================================================================================
        │
        ├─► [ VLAN 10: YÖNETİM (MGMT) - 10.0.10.0/24 ]
-       │    ├─ Proxmox VE Host (pve.corp.ozbucak.com.tr) [Port: 8006]
+       │    ├─ Proxmox VE Host (pve.corp.example.com) [Port: 8006]
        │    └─ RHEL VM (Ansible & OpenTofu IaC Engine)
        │
        ├─► [ VLAN 20: KİMLİK VE CORE (CORE) - 10.0.20.0/24 ]
-       │    └─ Fedora VM (FreeIPA - corp.ozbucak.com.tr) [10.0.20.2]
+       │    └─ Fedora VM (FreeIPA - corp.example.com) [10.0.20.2]
        │        ├─ DNS (53 TCP/UDP) ──► Tüm sistemlerin DNS merkezi
        │        ├─ Kerberos (88) ────► SSSD ve Sistem girişleri
        │        └─ LDAPS (636) ──────► Keycloak & Vault Kullanıcı Sorguları
@@ -77,3 +77,11 @@ Bu proje; bir şirketin tüm IT, Kimlik Yönetimi (IAM), Sır Yönetimi (Secret 
                  ├─ Teleport CE Bastion (3080/3022)
                  ├─ Squid Gateway (3128) - İç ağ paket çıkış kapısı
                  └─ Netbox, Forgejo + Woodpecker CI, Wiki.js, Project Pulp
+
+                 ## 👨‍💻 Mimar & Geliştirici (Author)
+
+Bu Enterprise Reference Architecture laboratuvar simülasyonu, kurumsal bilgi güvenliği ve sistem yönetimi standartları göz önüne alınarak tasarlanmıştır.
+
+**Geliştirici:** [Ersin ÖZBUCAK]  
+**Web Sitesi / İletişim:** [www.ozbucak.com.tr](https://www.ozbucak.com.tr)  
+**LinkedIn:** [(https://www.linkedin.com/in/ersinozbucak/)]
