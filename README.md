@@ -78,10 +78,12 @@ Bu proje; bir şirketin tüm IT, Kimlik Yönetimi (IAM), Sır Yönetimi (Secret 
                  ├─ Squid Gateway (3128) - İç ağ paket çıkış kapısı
                  └─ Netbox, Forgejo + Woodpecker CI, Wiki.js, Project Pulp
 
-                 ## 👨‍💻 Mimar & Geliştirici (Author)
+---
 
-Bu Enterprise Reference Architecture laboratuvar simülasyonu, kurumsal bilgi güvenliği ve sistem yönetimi standartları göz önüne alınarak tasarlanmıştır.
+## 👨‍💻 Mimar & Geliştirici (Author)
 
-**Geliştirici:** [Ersin ÖZBUCAK]  
-**Web Sitesi / İletişim:** [www.ozbucak.com.tr](https://www.ozbucak.com.tr)  
-**LinkedIn:** [(https://www.linkedin.com/in/ersinozbucak/)]
+Bu **Enterprise Reference Architecture** laboratuvar simülasyonu, kurumsal bilgi güvenliği ve sistem yönetimi standartları göz önüne alınarak tasarlanmıştır.
+
+* **Geliştirici:** Ersin ÖZBUCAK
+* **Web Sitesi / İletişim:** [www.ozbucak.com.tr](https://www.ozbucak.com.tr)
+* **LinkedIn:** [Ersin ÖZBUCAK](https://www.linkedin.com/in/ersinozbucak/)
