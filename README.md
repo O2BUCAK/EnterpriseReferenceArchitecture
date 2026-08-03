@@ -77,6 +77,7 @@ Bu proje; bir şirketin tüm IT, Kimlik Yönetimi (IAM), Sır Yönetimi (Secret 
                  ├─ Teleport CE Bastion (3080/3022)
                  ├─ Squid Gateway (3128) - İç ağ paket çıkış kapısı
                  └─ Netbox, Forgejo + Woodpecker CI, Wiki.js, Project Pulp
+```
 
 ---
 
