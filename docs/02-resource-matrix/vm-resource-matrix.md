@@ -38,7 +38,7 @@ flowchart TB
 
     PVE --> FW["fw01<br/>OPNsense"]
     PVE --> IPA["ipa01<br/>FreeIPA"]
-    PVE --> PG["pg01<br/>PostgreSQL"]
+    PVE --> PG["db01<br/>PostgreSQL"]
     PVE --> DOCKER["docker01<br/>Docker Platform"]
     PVE --> RHEL["rhel01<br/>Ansible + OpenTofu"]
 ```
@@ -61,7 +61,7 @@ Example FQDNs:
 pve.corp.example.com
 fw01.corp.example.com
 ipa01.corp.example.com
-pg01.corp.example.com
+db01.corp.example.com
 docker01.corp.example.com
 rhel01.corp.example.com
 ```
@@ -103,7 +103,7 @@ flowchart TB
 
     RHEL["rhel01<br/>Ansible + OpenTofu"]
     IPA["ipa01<br/>FreeIPA"]
-    PG["pg01<br/>PostgreSQL"]
+    PG["db01<br/>PostgreSQL"]
     DOCKER["docker01<br/>Docker Platform"]
 
     INTERNET --> FW
@@ -127,7 +127,7 @@ flowchart TB
 | --------: | ---------- | ------------------ | ---------------- | ---: | ------------- | -----: | --------: | ---------: | ---------: | ---------: |
 |       100 | `fw01`     | Firewall / Gateway | OPNsense         |    — | `10.10.x.1`   |      2 |  **4 GB** |      40 GB |          — |      40 GB |
 |       101 | `ipa01`    | Identity / DNS     | Fedora Server    |   20 | `10.10.20.10` |      2 |      2 GB |      16 GB |      16 GB |      32 GB |
-|       102 | `pg01`     | Central PostgreSQL | Pardus Server    |   30 | `10.10.30.10` |      4 |      8 GB |      32 GB |      96 GB |     128 GB |
+|       102 | `db01`     | Central PostgreSQL | Pardus Server    |   30 | `10.10.30.10` |      4 |      8 GB |      32 GB |      96 GB |     128 GB |
 |       103 | `docker01` | Container Platform | Ubuntu Server    |   40 | `10.10.40.10` |      4 |     10 GB |      32 GB |     128 GB |     160 GB |
 |       104 | `rhel01`   | Automation         | RHEL             |   10 | `10.10.10.10` |      2 |      4 GB |      20 GB |      20 GB |      40 GB |
 | **TOTAL** |            |                    |                  |      |               | **14** | **28 GB** | **140 GB** | **260 GB** | **400 GB** |
@@ -147,7 +147,7 @@ The initial VM allocation is:
 ```text
 fw01       2 vCPU
 ipa01      2 vCPU
-pg01       4 vCPU
+db01       4 vCPU
 docker01   4 vCPU
 rhel01     2 vCPU
 -----------------
@@ -165,7 +165,7 @@ This results in a controlled CPU overcommit ratio:
 
 ```mermaid
 pie title vCPU Allocation
-    "pg01 - PostgreSQL" : 4
+    "db01 - PostgreSQL" : 4
     "docker01 - Docker" : 4
     "fw01 - OPNsense" : 2
     "ipa01 - FreeIPA" : 2
@@ -190,7 +190,7 @@ VM allocation:
 ```text
 fw01       4 GB
 ipa01      2 GB
-pg01       8 GB
+db01       8 GB
 docker01  10 GB
 rhel01     4 GB
 -----------------
@@ -208,7 +208,7 @@ Remaining:
 ```mermaid
 pie title RAM Allocation
     "docker01 - Docker Platform" : 10
-    "pg01 - PostgreSQL" : 8
+    "db01 - PostgreSQL" : 8
     "fw01 - OPNsense" : 4
     "rhel01 - Automation" : 4
     "ipa01 - FreeIPA" : 2
@@ -252,7 +252,7 @@ for Proxmox storage overhead, future expansion and additional infrastructure req
 ```mermaid
 pie title Virtual Disk Allocation
     "docker01" : 160
-    "pg01" : 128
+    "db01" : 128
     "rhel01" : 40
     "fw01" : 40
     "ipa01" : 32
@@ -395,7 +395,7 @@ FreeIPA's documentation identifies 1.2 GB RAM as the minimum for installation wi
 
 ---
 
-# 11. pg01 — Central PostgreSQL
+# 11. db01 — Central PostgreSQL
 
 ### Purpose
 
@@ -404,7 +404,7 @@ Central relational database platform for applications that officially support Po
 ```mermaid
 flowchart TB
 
-    PG["pg01<br/>PostgreSQL"]
+    PG["db01<br/>PostgreSQL"]
 
     KC["Keycloak"]
     NB["NetBox"]
@@ -427,7 +427,7 @@ flowchart TB
 | Data Disk  |                   96 GB |
 | VLAN       |                      30 |
 | Example IP |           `10.10.30.10` |
-| FQDN       | `pg01.corp.example.com` |
+| FQDN       | `db01.corp.example.com` |
 
 ### Database Naming Standard
 
@@ -586,7 +586,7 @@ flowchart TD
     FW["fw01<br/>OPNsense"]
 
     IPA["ipa01<br/>FreeIPA"]
-    PG["pg01<br/>PostgreSQL"]
+    PG["db01<br/>PostgreSQL"]
     DOCKER["docker01<br/>Docker"]
     RHEL["rhel01<br/>Ansible + OpenTofu"]
 
@@ -653,7 +653,7 @@ flowchart TB
 
     HOST --> FW["fw01<br/>2 vCPU / 4 GB"]
     HOST --> IPA["ipa01<br/>2 vCPU / 2 GB"]
-    HOST --> PG["pg01<br/>4 vCPU / 8 GB"]
+    HOST --> PG["db01<br/>4 vCPU / 8 GB"]
     HOST --> DOCKER["docker01<br/>4 vCPU / 10 GB"]
     HOST --> RHEL["rhel01<br/>2 vCPU / 4 GB"]
 
