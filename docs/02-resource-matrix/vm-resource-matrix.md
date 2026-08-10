@@ -1,671 +1,779 @@
-VM Resource Matrix
-Enterprise Reference Architecture — FOSS Home Lab
-Documentation Notice
-All domain names, IP addresses, hostnames, infrastructure identifiers and resource allocations shown in this document are documentation-only examples. They do not represent the actual production or laboratory environment.
+# VM Resource Matrix
 
-1. Physical Host
-The reference architecture is designed to run on a Dell Latitude 5540 using Proxmox VE as the hypervisor.
-Resource
-Specification
-Physical Host
-Dell Latitude 5540
-CPU
-13th Gen Intel Core i7-1355U
-Physical Cores
-10
-Logical Threads
-12
-RAM
-32 GB DDR4-3200
-Storage
-512 GB PCIe NVMe Gen4 x4
-Hypervisor
-Proxmox VE
-Architecture
-x86-64 / AMD64
+> **Enterprise Reference Architecture — FOSS Home Lab**
 
-Resource allocation principle
-The physical host has limited resources compared with a production enterprise environment. Therefore:
-Official minimum requirements are documented separately.
-Official recommended requirements are documented separately.
-Lab Allocation represents the actual resource target for this reference implementation.
-Not all physical resources are assigned to virtual machines.
-RAM and storage headroom are intentionally preserved for the Proxmox host and future expansion.
-CPU overcommit is permitted at a controlled level because this is a laboratory simulation rather than a production workload.
+> [!IMPORTANT]
+> **Public Documentation Notice**
+>
+> All domain names, IP addresses, hostnames, infrastructure identifiers and resource allocations shown in this repository are **documentation-only examples**.
+>
+> They do not represent the actual production or laboratory environment.
+>
+> **Documentation Domain:** `corp.example.com`
 
-2. Public Network and DNS Convention
-All public documentation uses the reserved example domain:
+---
+
+## 1. Physical Host
+
+The reference architecture is designed to simulate an enterprise IT environment on a single physical host running **Proxmox VE**.
+
+| Resource        | Specification                  |
+| --------------- | ------------------------------ |
+| Physical Host   | Dell Latitude 5540             |
+| CPU             | 13th Gen Intel® Core™ i7-1355U |
+| Physical Cores  | 10                             |
+| Logical Threads | 12                             |
+| Memory          | 32 GB DDR4-3200                |
+| Storage         | 512 GB PCIe NVMe Gen4 x4       |
+| Hypervisor      | Proxmox VE                     |
+| Architecture    | x86-64 / AMD64                 |
+
+### Physical Resource Model
+
+```mermaid
+flowchart TB
+    HOST["Dell Latitude 5540<br/>12 Logical Threads / 32 GB RAM / 512 GB NVMe"]
+
+    HOST --> PVE["Proxmox VE"]
+
+    PVE --> FW["fw01<br/>OPNsense"]
+    PVE --> IPA["ipa01<br/>FreeIPA"]
+    PVE --> PG["pg01<br/>PostgreSQL"]
+    PVE --> DOCKER["docker01<br/>Docker Platform"]
+    PVE --> RHEL["rhel01<br/>Ansible + OpenTofu"]
+```
+
+---
+
+# 2. Public Naming Convention
+
+The real laboratory environment is intentionally separated from the public reference architecture.
+
+### Public Documentation
+
+```text
 corp.example.com
+```
 
-Example hostnames:
+Example FQDNs:
+
+```text
 pve.corp.example.com
 fw01.corp.example.com
 ipa01.corp.example.com
-db01.corp.example.com
+pg01.corp.example.com
 docker01.corp.example.com
 rhel01.corp.example.com
+```
 
-Example network:
+### Public Example Network
+
+```text
 10.10.0.0/16
+```
 
-Initial VLAN allocation:
-VLAN
-Network
-Purpose
-10
-10.10.10.0/24
-Management
-20
-10.10.20.0/24
-Identity / Core
-30
-10.10.30.0/24
-Database
-40
-10.10.40.0/24
-Application
+| VLAN | Network         | Purpose         |
+| ---: | --------------- | --------------- |
+|   10 | `10.10.10.0/24` | Management      |
+|   20 | `10.10.20.0/24` | Identity / Core |
+|   30 | `10.10.30.0/24` | Database        |
+|   40 | `10.10.40.0/24` | Application     |
 
 Gateway convention:
+
+```text
 10.10.<VLAN>.1
+```
 
+---
 
-3. VM Summary
-VM ID
-Hostname
-Role
-OS
-VLAN
-Example IP
-vCPU
-RAM
-OS Disk
-Data Disk
-100
-fw01
-Firewall / Gateway
-OPNsense
-—
-10.10.x.1
-2
-2 GB
-16 GB
-—
-101
-ipa01
-Identity / DNS / Kerberos
-Fedora Server
-20
-10.10.20.10
-2
-2 GB
-16 GB
-16 GB
-102
-db01
-Central PostgreSQL
-Pardus Server
-30
-10.10.30.10
-4
-8 GB
+# 3. VM Architecture
+
+```mermaid
+flowchart TB
+
+    INTERNET["External Network"]
+
+    FW["fw01<br/>OPNsense<br/>Firewall / Gateway"]
+
+    MGMT["VLAN 10<br/>Management<br/>10.10.10.0/24"]
+    CORE["VLAN 20<br/>Identity / Core<br/>10.10.20.0/24"]
+    DATA["VLAN 30<br/>Database<br/>10.10.30.0/24"]
+    APP["VLAN 40<br/>Application<br/>10.10.40.0/24"]
+
+    RHEL["rhel01<br/>Ansible + OpenTofu"]
+    IPA["ipa01<br/>FreeIPA"]
+    PG["pg01<br/>PostgreSQL"]
+    DOCKER["docker01<br/>Docker Platform"]
+
+    INTERNET --> FW
+
+    FW --> MGMT
+    FW --> CORE
+    FW --> DATA
+    FW --> APP
+
+    MGMT --> RHEL
+    CORE --> IPA
+    DATA --> PG
+    APP --> DOCKER
+```
+
+---
+
+# 4. VM Resource Matrix
+
+|     VM ID | Hostname   | Role               | Operating System | VLAN | Example IP    |   vCPU |       RAM |    OS Disk |  Data Disk | Total Disk |
+| --------: | ---------- | ------------------ | ---------------- | ---: | ------------- | -----: | --------: | ---------: | ---------: | ---------: |
+|       100 | `fw01`     | Firewall / Gateway | OPNsense         |    — | `10.10.x.1`   |      2 |  **4 GB** |      40 GB |          — |      40 GB |
+|       101 | `ipa01`    | Identity / DNS     | Fedora Server    |   20 | `10.10.20.10` |      2 |      2 GB |      16 GB |      16 GB |      32 GB |
+|       102 | `pg01`     | Central PostgreSQL | Pardus Server    |   30 | `10.10.30.10` |      4 |      8 GB |      32 GB |      96 GB |     128 GB |
+|       103 | `docker01` | Container Platform | Ubuntu Server    |   40 | `10.10.40.10` |      4 |     10 GB |      32 GB |     128 GB |     160 GB |
+|       104 | `rhel01`   | Automation         | RHEL             |   10 | `10.10.10.10` |      2 |      4 GB |      20 GB |      20 GB |      40 GB |
+| **TOTAL** |            |                    |                  |      |               | **14** | **28 GB** | **140 GB** | **260 GB** | **400 GB** |
+
+---
+
+# 5. CPU Allocation
+
+The physical CPU provides:
+
+```text
+12 logical threads
+```
+
+The initial VM allocation is:
+
+```text
+fw01       2 vCPU
+ipa01      2 vCPU
+pg01       4 vCPU
+docker01   4 vCPU
+rhel01     2 vCPU
+-----------------
+TOTAL     14 vCPU
+```
+
+This results in a controlled CPU overcommit ratio:
+
+```text
+14 vCPU / 12 logical threads
+≈ 1.17 : 1
+```
+
+### CPU Allocation
+
+```mermaid
+pie title vCPU Allocation
+    "pg01 - PostgreSQL" : 4
+    "docker01 - Docker" : 4
+    "fw01 - OPNsense" : 2
+    "ipa01 - FreeIPA" : 2
+    "rhel01 - Automation" : 2
+```
+
+> [!NOTE]
+> CPU overcommit is intentional but conservative. The architecture avoids aggressive overcommit because PostgreSQL and the Docker application platform may experience concurrent workloads.
+
+---
+
+# 6. Memory Allocation
+
+Physical memory:
+
+```text
 32 GB
-96 GB
-103
-docker01
-Container Platform
-Ubuntu Server
-40
-10.10.40.10
-4
-10 GB
-32 GB
-128 GB
-104
-rhel01
-Ansible / OpenTofu
-RHEL
-10
-10.10.10.10
-2
-4 GB
-20 GB
-20 GB
+```
 
-Initial VM resource allocation
-CPU
-12 physical/logical host threads
-        │
-        ├── fw01       2 vCPU
-        ├── ipa01      2 vCPU
-        ├── db01       4 vCPU
-        ├── docker01   4 vCPU
-        └── rhel01     2 vCPU
-                       ────────
-                       14 vCPU
+VM allocation:
 
-This represents a controlled CPU overcommit ratio of approximately 1.17:1.
-The architecture intentionally avoids excessive CPU overcommit because PostgreSQL, Keycloak and the Docker application platform may produce concurrent workloads.
+```text
+fw01       4 GB
+ipa01      2 GB
+pg01       8 GB
+docker01  10 GB
+rhel01     4 GB
+-----------------
+TOTAL     28 GB
+```
 
-4. RAM Budget
-Component
-RAM
-Physical RAM
-32 GB
-fw01
-2 GB
-ipa01
-2 GB
-db01
-8 GB
-docker01
-10 GB
-rhel01
-4 GB
-VM Allocation
-26 GB
-Reserved for Proxmox / Headroom
-6 GB
+Remaining:
 
-RAM allocation principle
-The 6 GB unallocated memory is intentional.
-It provides:
-Proxmox VE operating overhead
-filesystem cache
-temporary workload spikes
-VM management overhead
-future experimentation
-protection against immediate memory exhaustion
-The VM allocation therefore does not consume the entire 32 GB physical memory capacity.
+```text
+32 GB - 28 GB = 4 GB
+```
 
-5. Storage Budget
-The physical host contains a single 512 GB NVMe device.
-The reference architecture uses two virtual disks for Linux VMs:
-Disk 1
-└── Operating System
+### RAM Allocation
 
-Disk 2
-└── System / Application Data
-    ├── /var
-    ├── /home
-    └── /tmp
+```mermaid
+pie title RAM Allocation
+    "docker01 - Docker Platform" : 10
+    "pg01 - PostgreSQL" : 8
+    "fw01 - OPNsense" : 4
+    "rhel01 - Automation" : 4
+    "ipa01 - FreeIPA" : 2
+    "Proxmox / Host Headroom" : 4
+```
 
-Recommended Linux layout:
+The remaining 4 GB is deliberately reserved for:
+
+* Proxmox VE
+* filesystem cache
+* hypervisor overhead
+* temporary workload spikes
+* future adjustments
+
+---
+
+# 7. Storage Allocation
+
+The physical host contains:
+
+```text
+512 GB NVMe
+```
+
+The VM allocation is:
+
+```text
+400 GB
+```
+
+leaving approximately:
+
+```text
+112 GB
+```
+
+for Proxmox storage overhead, future expansion and additional infrastructure requirements.
+
+### Storage Allocation
+
+```mermaid
+pie title Virtual Disk Allocation
+    "docker01" : 160
+    "pg01" : 128
+    "rhel01" : 40
+    "fw01" : 40
+    "ipa01" : 32
+    "Unallocated / Host Capacity" : 112
+```
+
+> [!NOTE]
+> Actual usable capacity depends on Proxmox storage configuration, filesystem overhead and thin/thick provisioning.
+
+---
+
+# 8. Linux VM Disk Standard
+
+Linux VMs use two virtual disks.
+
+```mermaid
+flowchart LR
+
+    VM["Linux VM"]
+
+    D1["Disk 1<br/>Operating System"]
+
+    D2["Disk 2<br/>System / Application Data"]
+
+    LVM["LVM"]
+
+    VAR["/var"]
+    HOME["/home"]
+    TMP["/tmp"]
+
+    VM --> D1
+    VM --> D2
+    D2 --> LVM
+
+    LVM --> VAR
+    LVM --> HOME
+    LVM --> TMP
+```
+
+### Disk Standard
+
+```text
 Disk 1
 └── /
-    
+
 Disk 2
 └── LVM
     ├── /var
     ├── /home
     └── /tmp
+```
 
-The exact filesystem and LVM allocation will be defined during the OS installation phase.
+The purpose is to isolate operating-system resources from system and application data.
 
-Storage Allocation
-VM
-OS Disk
-Data Disk
-Total
-fw01
-16 GB
-—
-16 GB
-ipa01
-16 GB
-16 GB
-32 GB
-db01
-32 GB
-96 GB
-128 GB
-docker01
-32 GB
-128 GB
-160 GB
-rhel01
-20 GB
-20 GB
-40 GB
-VM Total
-116 GB
-260 GB
-376 GB
+Examples:
 
-This leaves approximately:
-512 GB
-- 376 GB VM allocation
-= 136 GB
+```text
+/var/lib/postgresql
+/var/lib/docker
+/var/log
+```
 
-before accounting for Proxmox filesystem/storage overhead and other host-level requirements.
-The remaining capacity is deliberately retained rather than immediately consumed.
+remain on the second virtual disk through the `/var` filesystem.
 
-6. VM 100 — fw01
-Role
-OPNsense Firewall / Router / VLAN Gateway
-fw01.corp.example.com
+---
 
-Resource allocation
-Resource
-Value
-vCPU
-2
-RAM
-2 GB
-OS Disk
-16 GB
-Data Disk
-Not required
-Network
-WAN + VLAN interfaces
+# 9. OPNsense Exception
 
-Official requirements
-OPNsense documents:
-Level
-CPU
-RAM
-Storage
-Minimum
-1 GHz dual-core
-3 GB
-4 GB
-Reasonable
-1 GHz dual-core
-4 GB
-40 GB SSD
-Recommended
-1.5 GHz multi-core
-8 GB
-120 GB SSD
+OPNsense is not forced into the Linux VM disk model.
 
-OPNsense also notes that Squid and other disk-writing features can materially affect resource requirements.
-Lab decision
-Important: The initial allocation of 2 GB RAM is intentionally below the current official minimum and therefore should not be considered a compliant final allocation.
-Because this architecture includes Squid Gateway functionality, the final lab target should be:
-fw01
-2 vCPU
-4 GB RAM
-40 GB disk
+```mermaid
+flowchart LR
 
-This corresponds to the official "reasonable" specification and is much more appropriate for the planned feature set.
-Therefore, 4 GB RAM / 40 GB storage should be the final matrix value.
+    FW["fw01<br/>OPNsense"]
 
-7. VM 101 — ipa01
-Role
-Central Identity and DNS
-Services:
-FreeIPA
-├── LDAP
-├── Kerberos
-├── DNS
-├── Certificate Authority
-└── Identity Management
+    STORAGE["Dedicated OPNsense<br/>Storage Layout"]
 
-FQDN:
-ipa01.corp.example.com
+    FW --> STORAGE
+```
 
-Example realm:
-CORP.EXAMPLE.COM
+The Linux-specific:
 
-Example IP:
-10.10.20.10
+```text
+/
+/var
+/home
+/tmp
+```
 
-Resource allocation
-Resource
-Value
-vCPU
-2
-RAM
-2 GB
-OS Disk
-16 GB
-Data Disk
-16 GB
-VLAN
-20
+separation is therefore **not applicable to OPNsense**.
 
-FreeIPA's official Quick Start documentation states that a minimum of 1.2 GB RAM is required to install with a CA and recommends 2 GB for a demo/test system. It also emphasizes static hostname/DNS prerequisites.
-Lab decision
-2 vCPU
-2 GB RAM
-32 GB total storage
+### OPNsense Resource Decision
 
-is appropriate for the initial single-node laboratory deployment.
-FreeIPA's required service ports will be documented separately in the Port Matrix. The project documentation identifies HTTP/HTTPS, LDAP/LDAPS, Kerberos and NTP among the required services.
+| Resource | Official / Reference | Lab Allocation |
+| -------- | -------------------: | -------------: |
+| CPU      |    Dual-core minimum |         2 vCPU |
+| RAM      |         3 GB minimum |       **4 GB** |
+| Storage  |         4 GB minimum |      **40 GB** |
 
-8. VM 102 — db01
-Role
-Central PostgreSQL Database Platform
-FQDN:
-db01.corp.example.com
+OPNsense documents 3 GB RAM as the minimum, 4 GB as a reasonable configuration and 8 GB as the recommended level. The increased allocation is particularly relevant because this architecture includes additional services such as Squid.
 
-Example IP:
-10.10.30.10
+---
 
-Resource allocation
-Resource
-Value
-vCPU
-4
-RAM
-8 GB
-OS Disk
-32 GB
-Data Disk
-96 GB
-VLAN
-30
+# 10. ipa01 — FreeIPA
 
-Database architecture
-                   db01
-                     │
-          ┌──────────┼──────────┐
-          │          │          │
-      Keycloak     NetBox    Forgejo
-          │          │          │
-          └──────────┼──────────┘
-                     │
-               PostgreSQL
+### Purpose
 
-Applications will receive separate databases and database roles.
-Example:
-netbox_db
-netbox_dba
+Central identity and infrastructure services:
 
+```mermaid
+flowchart TB
+
+    IPA["ipa01<br/>FreeIPA"]
+
+    LDAP["LDAP"]
+    KRB["Kerberos"]
+    DNS["DNS"]
+    CA["Certificate Authority"]
+    IAM["Identity Management"]
+
+    IPA --> LDAP
+    IPA --> KRB
+    IPA --> DNS
+    IPA --> CA
+    IPA --> IAM
+```
+
+| Resource   |               Allocation |
+| ---------- | -----------------------: |
+| vCPU       |                        2 |
+| RAM        |                     2 GB |
+| OS Disk    |                    16 GB |
+| Data Disk  |                    16 GB |
+| VLAN       |                       20 |
+| Example IP |            `10.10.20.10` |
+| FQDN       | `ipa01.corp.example.com` |
+| Realm      |       `CORP.EXAMPLE.COM` |
+
+FreeIPA's documentation identifies 1.2 GB RAM as the minimum for installation with a CA and recommends 2 GB for a demo/test environment.
+
+---
+
+# 11. pg01 — Central PostgreSQL
+
+### Purpose
+
+Central relational database platform for applications that officially support PostgreSQL.
+
+```mermaid
+flowchart TB
+
+    PG["pg01<br/>PostgreSQL"]
+
+    KC["Keycloak"]
+    NB["NetBox"]
+    FG["Forgejo"]
+    WK["Wiki.js"]
+    PULP["Project Pulp"]
+
+    KC --> PG
+    NB --> PG
+    FG --> PG
+    WK --> PG
+    PULP --> PG
+```
+
+| Resource   |              Allocation |
+| ---------- | ----------------------: |
+| vCPU       |                       4 |
+| RAM        |                    8 GB |
+| OS Disk    |                   32 GB |
+| Data Disk  |                   96 GB |
+| VLAN       |                      30 |
+| Example IP |           `10.10.30.10` |
+| FQDN       | `pg01.corp.example.com` |
+
+### Database Naming Standard
+
+```text
+Application
+    │
+    ├── Database
+    │      └── <application>_db
+    │
+    └── Database User
+           └── <application>_dba
+```
+
+Examples:
+
+```text
 keycloak_db
 keycloak_dba
 
+netbox_db
+netbox_dba
+
 forgejo_db
 forgejo_dba
+```
 
-PostgreSQL does not publish a single universal "minimum RAM" value comparable to OPNsense or FreeIPA. Its documentation instead provides workload-oriented configuration guidance. For a dedicated PostgreSQL server with at least 1 GB RAM, PostgreSQL documents 25% of system memory as a reasonable starting point for shared_buffers, while noting that the workload determines the appropriate value.
-Lab decision
-4 vCPU
-8 GB RAM
-32 GB OS
-96 GB PostgreSQL data
+Each application receives its own database and least-privileged database identity.
 
-The relatively larger allocation is intentional because db01 is a shared database platform, rather than a single-application database.
+> [!IMPORTANT]
+> Applications are **not forced to PostgreSQL** when their official architecture requires another datastore. Specialized storage systems remain application-specific.
 
-9. VM 103 — docker01
-Role
-Central Application / Container Platform
-FQDN:
-docker01.corp.example.com
+---
 
-Example IP:
-10.10.40.10
+# 12. docker01 — Container Platform
 
-Resource allocation
-Resource
-Value
-vCPU
-4
-RAM
-10 GB
-OS Disk
-32 GB
-Data Disk
-128 GB
-VLAN
-40
+### Purpose
 
-Planned services
-docker01
-│
-├── Nginx
-├── Portainer
-├── Teleport CE
-├── Keycloak
-├── OpenBao
-├── NetBox
-├── Squid
-├── Forgejo
-├── Woodpecker CI
-├── Wiki.js
-└── Project Pulp
+Central application platform for FOSS enterprise services.
 
-Docker Engine's official Linux installation documentation does not specify a universal minimum RAM value for Docker Engine itself. It specifies supported architectures/platforms and Linux prerequisites instead. Docker's separate Docker Desktop documentation does specify 4 GB RAM, but that requirement applies to Docker Desktop rather than Docker Engine on a Linux server.
-Therefore, Docker Desktop requirements must not be incorrectly used to size docker01.
-Lab decision
-4 vCPU
-10 GB RAM
-32 GB OS
-128 GB application/container data
+```mermaid
+flowchart TB
 
-The 10 GB allocation is based on the combined application workload, not on a Docker Engine minimum.
-The data disk is primarily intended for:
+    D["docker01<br/>Docker Engine"]
+
+    RP["Nginx"]
+    BAO["OpenBao"]
+    KC["Keycloak"]
+    TP["Teleport CE"]
+    NB["NetBox"]
+    FG["Forgejo"]
+    WC["Woodpecker CI"]
+    WK["Wiki.js"]
+    SQ["Squid"]
+    PU["Project Pulp"]
+    PT["Portainer"]
+
+    D --> RP
+    D --> BAO
+    D --> KC
+    D --> TP
+    D --> NB
+    D --> FG
+    D --> WC
+    D --> WK
+    D --> SQ
+    D --> PU
+    D --> PT
+```
+
+| Resource   |                  Allocation |
+| ---------- | --------------------------: |
+| vCPU       |                           4 |
+| RAM        |                       10 GB |
+| OS Disk    |                       32 GB |
+| Data Disk  |                      128 GB |
+| VLAN       |                          40 |
+| Example IP |               `10.10.40.10` |
+| FQDN       | `docker01.corp.example.com` |
+
+The 10 GB RAM allocation is **not a Docker minimum**. It is a workload allocation for the collection of services planned for this VM.
+
+### Data Disk
+
+The data disk is primarily used for:
+
+```text
 /var
 ├── /var/lib/docker
 ├── container volumes
 ├── application data
 └── logs
+```
 
-Application-specific volume placement will be defined in the Docker Storage Matrix.
-Docker's own security guidance recommends enabling AppArmor or SELinux where supported.
+Application-specific storage requirements will be defined in the Docker Storage Matrix.
 
-10. VM 104 — rhel01
-Role
-Infrastructure Automation
-rhel01.corp.example.com
+---
 
-Services:
-Ansible
-OpenTofu
+# 13. rhel01 — Automation
 
-Example IP:
-10.10.10.10
+### Purpose
 
-Resource allocation
-Resource
-Value
-vCPU
-2
-RAM
-4 GB
-OS Disk
-20 GB
-Data Disk
-20 GB
-VLAN
-10
+Central Infrastructure-as-Code and configuration-management node.
 
-Red Hat's RHEL 10 installation documentation specifies minimum RAM values for installation, with x86_64 local-media installation requiring 1.5 GiB, and at least 10 GiB available disk space.
-These are OS installation requirements, not requirements for running a useful Ansible/OpenTofu automation controller.
-Lab decision
-2 vCPU
-4 GB RAM
-40 GB total storage
+```mermaid
+flowchart LR
 
-is selected to provide sufficient room for:
-RHEL
-Ansible
-OpenTofu
-Git repositories
-Python environments
-automation artifacts
-temporary provisioning data
+    R["rhel01"]
 
-11. Final Resource Matrix
-VM
-Hostname
-Role
-vCPU
-RAM
-OS Disk
-Data Disk
-Total Disk
-VLAN
-fw01
-fw01.corp.example.com
-Firewall
-2
-4 GB
-40 GB
-—
-40 GB
-—
-ipa01
-ipa01.corp.example.com
-Identity / DNS
-2
-2 GB
-16 GB
-16 GB
-32 GB
-20
-db01
-db01.corp.example.com
-PostgreSQL
-4
-8 GB
-32 GB
-96 GB
-128 GB
-30
-docker01
-docker01.corp.example.com
-Docker Platform
-4
-10 GB
-32 GB
-128 GB
-160 GB
-40
-rhel01
-rhel01.corp.example.com
-Automation
-2
-4 GB
-20 GB
-20 GB
-40 GB
-10
-TOTAL
+    A["Ansible"]
+    T["OpenTofu"]
 
+    P["Proxmox"]
+    FW["OPNsense"]
+    IPA["FreeIPA"]
+    PG["PostgreSQL"]
+    DOCKER["docker01"]
 
+    R --> A
+    R --> T
 
+    A --> IPA
+    A --> PG
+    A --> DOCKER
+    A --> FW
 
-14
-28 GB
-140 GB
-260 GB
-400 GB
+    T --> P
+```
 
+| Resource   |                Allocation |
+| ---------- | ------------------------: |
+| vCPU       |                         2 |
+| RAM        |                      4 GB |
+| OS Disk    |                     20 GB |
+| Data Disk  |                     20 GB |
+| VLAN       |                        10 |
+| Example IP |             `10.10.10.10` |
+| FQDN       | `rhel01.corp.example.com` |
 
+The VM provides sufficient room for:
 
-Physical host comparison
-Resource
-Physical Capacity
-VM Allocation
-Remaining
-CPU Threads
-12
-14 vCPU
-Controlled overcommit
-RAM
-32 GB
-28 GB
-4 GB
-NVMe
-512 GB
-400 GB
-~112 GB
+* RHEL
+* Ansible
+* OpenTofu
+* Git repositories
+* Python environments
+* automation artifacts
+* temporary provisioning data
 
+---
 
-12. Resource Allocation Decision
-The final initial allocation is therefore:
-                        Dell Latitude 5540
-                     12 Threads / 32 GB RAM
-                              │
-              ┌───────────────┴────────────────┐
-              │                                │
-          Proxmox VE                       VM Layer
-              │                                │
-              │       ┌────────────────────────┼───────────────┐
-              │       │                        │               │
-              │     fw01                     ipa01           db01
-              │     2C/4G                    2C/2G           4C/8G
-              │
-              │                                │
-              │                         ┌──────┴──────┐
-              │                         │             │
-              │                     docker01       rhel01
-              │                     4C/10G          2C/4G
-              │
-              └──────────────────────────────────────────────
+# 14. Dependency Overview
 
-The architecture deliberately prioritizes:
-PostgreSQL availability — central database platform.
-Docker host capacity — multiple enterprise applications share the VM.
-Proxmox headroom — the host must not be memory-starved.
-Security services — FreeIPA receives dedicated resources.
-Firewall stability — OPNsense receives the official reasonable specification because Squid is planned.
+```mermaid
+flowchart TD
 
-13. Important Exception — OPNsense Disk Architecture
-The two-disk Linux VM standard does not apply literally to OPNsense.
-OPNsense is a FreeBSD-based network appliance rather than a conventional Linux server. Its official documentation provides its own storage and RAM guidance, and its filesystem architecture should not be artificially forced into:
-/
-/var
-/home
-/tmp
+    FW["fw01<br/>OPNsense"]
 
-Therefore:
-Linux VMs
-    ├── Disk 1 → /
-    └── Disk 2 → /var /home /tmp
+    IPA["ipa01<br/>FreeIPA"]
+    PG["pg01<br/>PostgreSQL"]
+    DOCKER["docker01<br/>Docker"]
+    RHEL["rhel01<br/>Ansible + OpenTofu"]
 
+    FW --> IPA
+    FW --> PG
+    FW --> DOCKER
+    FW --> RHEL
+
+    RHEL --> FW
+    RHEL --> IPA
+    RHEL --> PG
+    RHEL --> DOCKER
+
+    DOCKER --> IPA
+    DOCKER --> PG
+```
+
+The dependency hierarchy is:
+
+```text
 OPNsense
-    └── Appliance-specific storage layout
+   │
+   ├── Network
+   │
+   ├── DNS / Routing
+   │
+   ▼
+FreeIPA
+   │
+   ├── Identity
+   ├── DNS
+   ├── Kerberos
+   └── Certificates
+   │
+   ├──────────────┐
+   ▼              ▼
+PostgreSQL     Docker
+   │              │
+   │              ├── Nginx
+   │              ├── Keycloak
+   │              ├── OpenBao
+   │              ├── NetBox
+   │              ├── Teleport
+   │              ├── Forgejo
+   │              └── Other applications
+   │
+   └──────────────┘
 
-This is an intentional architecture exception.
+rhel01
+   │
+   └── Ansible / OpenTofu
+            │
+            └── Automation
+```
 
-14. Resource Sizing Philosophy
-This matrix does not claim that these allocations are production-ready.
-The project has three distinct sizing concepts:
-Official Minimum
-       ↓
-Official Recommended
-       ↓
-Reference Lab Allocation
+---
 
-The lab allocation is determined by:
-official requirements
-workload
-number of applications
-physical host capacity
-security architecture
-expected concurrency
-future expansion
-resource isolation
-This distinction prevents the common mistake of treating a software vendor's minimum installation requirement as a suitable production or multi-service workload size.
+# 15. Final Resource Summary
 
-15. Future Expansion
-The second stage of the project introduces a separate Windows PC hosting Docker Desktop and additional security, monitoring and IT management workloads.
-Stage 2 services include:
-Nuclei
-Grype
-OWASP ZAP
-Wazuh
-Nextcloud
-Zabbix
-Prometheus
-Grafana
-GLPI
-Grafana Loki
-StackStorm
+```mermaid
+flowchart TB
 
-These services are not included in the current Dell VM Resource Matrix.
-Where an application officially supports PostgreSQL, its database workload will be evaluated for use with:
-db01.corp.example.com
+    HOST["Dell Latitude 5540<br/>32 GB RAM / 12 Threads / 512 GB NVMe"]
 
-Applications requiring a specialized datastore will retain their officially supported storage architecture rather than being forced into PostgreSQL.
+    HOST --> FW["fw01<br/>2 vCPU / 4 GB"]
+    HOST --> IPA["ipa01<br/>2 vCPU / 2 GB"]
+    HOST --> PG["pg01<br/>4 vCPU / 8 GB"]
+    HOST --> DOCKER["docker01<br/>4 vCPU / 10 GB"]
+    HOST --> RHEL["rhel01<br/>2 vCPU / 4 GB"]
 
-Official References
-OPNsense hardware sizing and requirements: OPNsense Hardware Sizing & Setup
-FreeIPA Quick Start and RAM requirements: FreeIPA Quick Start Guide
-FreeIPA installation and required services: FreeIPA Install and Deploy
-PostgreSQL resource consumption: PostgreSQL Resource Consumption
-Docker Engine installation: Docker Engine Documentation
-RHEL 10 system requirements: Red Hat Enterprise Linux 10 System Requirements
-Pardus releases and system requirements: Pardus Releases
+    HOST --> RES["Reserved<br/>4 GB RAM / ~112 GB Storage"]
+```
 
+| Resource    | Physical Capacity | VM Allocation |              Reserved |
+| ----------- | ----------------: | ------------: | --------------------: |
+| CPU Threads |                12 |       14 vCPU | Controlled overcommit |
+| RAM         |             32 GB |         28 GB |                  4 GB |
+| NVMe        |            512 GB |        400 GB |               ~112 GB |
+
+---
+
+# 16. Design Principles
+
+This resource matrix follows these principles:
+
+### 1. Security First
+
+Resources are allocated to maintain service isolation and prevent unnecessary consolidation.
+
+### 2. Least Privilege
+
+Applications will receive only the database, network and identity access required for their function.
+
+### 3. Centralized Services
+
+Core enterprise functions are centralized:
+
+```text
+Identity  → FreeIPA
+Database  → PostgreSQL
+Secrets   → OpenBao
+Access    → Teleport
+Proxy     → Nginx
+Automation → Ansible / OpenTofu
+```
+
+### 4. Application Independence
+
+Centralization does not override official application architecture.
+
+### 5. Resource Awareness
+
+The architecture is designed around a 32 GB RAM / 12-thread physical host and therefore intentionally avoids production-scale resource assumptions.
+
+### 6. Reproducibility
+
+The final configuration is intended to be reproducible using:
+
+```text
+OpenTofu
+Ansible
+Docker Compose
+Git
+```
+
+### 7. Public Documentation Sanitization
+
+The public repository uses:
+
+```text
+corp.example.com
+10.10.0.0/16
+```
+
+instead of real infrastructure identifiers.
+
+---
+
+# 17. Next Architecture Documents
+
+The VM Resource Matrix establishes the resource foundation for the remaining architecture documents.
+
+The planned sequence is:
+
+```mermaid
+flowchart LR
+
+    VM["01<br/>VM Resource Matrix"]
+    VLAN["02<br/>VLAN / IP Matrix"]
+    PORT["03<br/>Port Matrix"]
+    FW["04<br/>Firewall Matrix"]
+    FQDN["05<br/>FQDN Matrix"]
+    IAM["06<br/>Identity / Account Matrix"]
+    DB["07<br/>PostgreSQL Database Matrix"]
+    DNS["08<br/>DNS Matrix"]
+    DOCKER["09<br/>Docker Network Matrix"]
+    SECRET["10<br/>OpenBao Secret Matrix"]
+    PKI["11<br/>PKI / Certificate Matrix"]
+    INSTALL["12<br/>Installation Order"]
+
+    VM --> VLAN
+    VLAN --> PORT
+    PORT --> FW
+    FW --> FQDN
+    FQDN --> IAM
+    IAM --> DB
+    DB --> DNS
+    DNS --> DOCKER
+    DOCKER --> SECRET
+    SECRET --> PKI
+    PKI --> INSTALL
+```
+
+---
+
+## Official References
+
+* [OPNsense — Hardware Sizing & Setup](https://docs.opnsense.org/manual/hardware.html)
+* [FreeIPA — Quick Start Guide](https://www.freeipa.org/page/Quick_Start_Guide)
+* [FreeIPA — Install and Deploy](https://www.freeipa.org/page/InstallAndDeploy.html)
+* [PostgreSQL — Resource Consumption](https://www.postgresql.org/docs/current/runtime-config-resource.html)
+* [Docker Engine — Installation](https://docs.docker.com/engine/install/)
+* [Red Hat Enterprise Linux 10 — System Requirements](https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/10/html/interactively_installing_rhel_over_the_network/system-requirements-and-supported-architectures)
+
+---
+
+> **Document Status:** Draft — Architecture Design Phase
+> **Environment:** Public Reference Architecture
+> **Documentation Domain:** `corp.example.com`
+> **Real Infrastructure:** Not disclosed
