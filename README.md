@@ -57,13 +57,13 @@ The current reference architecture consists of five primary virtual machines:
    │FreeIPA│    │Postgre│ │ Docker│ │Ansible│ │ Nodes  │
    │       │    │ SQL   │ │       │ │OpenTofu││        │
    └───────┘    └───────┘ └───┬───┘ └───────┘ └────────┘
-                               │
-                        ┌──────┴──────┐
-                        │   Docker    │
-                        │  Networks   │
-                        ├─────────────┤
-                        │ Containers  │
-                        └─────────────┘
+                              │
+                       ┌──────┴──────┐
+                       │   Docker    │
+                       │  Networks   │
+                       ├─────────────┤
+                       │ Containers  │
+                       └─────────────┘
 ```
 
 The diagram represents the logical architecture rather than exposing real network addresses or other environment-specific information.
