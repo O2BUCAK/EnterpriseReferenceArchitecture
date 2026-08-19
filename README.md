@@ -43,28 +43,27 @@ The current reference architecture consists of five primary virtual machines:
                      │   Router    │
                      └──────┬──────┘
                             │
-                     Internal Network
+                    ┌───────┴────────┐
+                    │ Internal       │
+                    │ Network        │
+                    └───────┬────────┘
                             │
-          ┌─────────────────┼─────────────────┐
-          │                 │                 │
-          ▼                 ▼                 ▼
-   ┌─────────────┐   ┌─────────────┐   ┌─────────────┐
-   │    ipa01    │   │    db01     │   │    app01    │
-   │   Fedora    │   │   Pardus    │   │   Ubuntu    │
-   │   FreeIPA   │   │ PostgreSQL  │   │   Docker    │
-   │   Identity  │   │  Database   │   │ Application │
-   └─────────────┘   └─────────────┘   └─────────────┘
-                                             │
-                                             │
-                                      Container Platform
-                                             │
-                                             ▼
-                                      ┌─────────────┐
-                                      │    auto01   │
-                                      │    RHEL     │
-                                      │   Ansible   │
-                                      │   OpenTofu  │
-                                      └─────────────┘
+       ┌────────────┬───────┼────────┬────────────┐
+       │            │       │        │            │
+       ▼            ▼       ▼        ▼            ▼
+   ┌───────┐    ┌───────┐ ┌───────┐ ┌───────┐ ┌────────┐
+   │ ipa01 │    │ db01  │ │ app01 │ │auto01 │ │ ...    │
+   │Fedora │    │Pardus │ │Ubuntu │ │ RHEL  │ │Future  │
+   │FreeIPA│    │Postgre│ │ Docker│ │Ansible│ │ Nodes  │
+   │       │    │ SQL   │ │       │ │OpenTofu││        │
+   └───────┘    └───────┘ └───┬───┘ └───────┘ └────────┘
+                               │
+                        ┌──────┴──────┐
+                        │   Docker    │
+                        │  Networks   │
+                        ├─────────────┤
+                        │ Containers  │
+                        └─────────────┘
 ```
 
 The diagram represents the logical architecture rather than exposing real network addresses or other environment-specific information.
