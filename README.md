@@ -63,6 +63,21 @@ The detailed architecture, network design, infrastructure components, and securi
 
 ## Key Technologies
 
+* **Virtualization:** Proxmox VE
+* **Network Security:** OPNsense, VLAN-based segmentation
+* **Identity & Access:** FreeIPA, Keycloak, Teleport
+* **Secrets Management:** OpenBao
+* **Operating Systems:** Fedora, Ubuntu, RHEL, Pardus
+* **Containerization:** Docker
+* **Automation & IaC:** Ansible, OpenTofu
+* **Infrastructure Management:** NetBox
+* **CI/CD & Development:** Forgejo, Woodpecker CI
+* **Web & Application Delivery:** Nginx
+* **Database:** PostgreSQL
+* **Documentation & Knowledge:** Wiki.js
+* **Package & Artifact Management:** Pulp
+
+The architecture follows **FOSS-first**, **Zero Trust**, **Zero Plaintext**, **network segmentation**, and **automation-first** principles.
 ...
 
 ## Project Structure
