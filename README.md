@@ -11,53 +11,64 @@
 
 - [About the Project](#about-the-project)
 - [The Story Behind the Project](#the-story-behind-the-project)
-  - [Where I Came From](#where-i-came-from)
-  - [Why I Started This Project](#why-i-started-this-project)
-  - [From Home Lab to Enterprise Reference Architecture](#from-home-lab-to-enterprise-reference-architecture)
-- [Project Goals](#project-goals)
-- [Design Principles](#design-principles)
 - [Architecture Overview](#architecture-overview)
-  - [High-Level Architecture](#high-level-architecture)
-  - [Network Segmentation](#network-segmentation)
-  - [Infrastructure Roles](#infrastructure-roles)
-- [Current Technology Stack](#current-technology-stack)
-- [Architecture Decisions](#architecture-decisions)
-  - [Virtualization: Proxmox VE](#virtualization-proxmox-ve)
-  - [Firewall: OPNsense](#firewall-opnsense)
-  - [Identity Management: FreeIPA](#identity-management-freeipa)
-  - [Operating Systems](#operating-systems)
-  - [Database: PostgreSQL](#database-postgresql)
-  - [Containers: Docker](#containers-docker)
-  - [Infrastructure as Code: OpenTofu](#infrastructure-as-code-opentofu)
-  - [Configuration Management: Ansible](#configuration-management-ansible)
-- [Security Architecture](#security-architecture)
-  - [Zero Trust](#zero-trust)
-  - [Network Microsegmentation](#network-microsegmentation)
-  - [Secrets Management](#secrets-management)
-  - [Access Control](#access-control)
-  - [Credential Naming Convention](#credential-naming-convention)
-- [Application Platform](#application-platform)
-  - [Web and Reverse Proxy](#web-and-reverse-proxy)
-  - [Identity and Access](#identity-and-access)
-  - [Privileged Access](#privileged-access)
-  - [Secrets Management](#secrets-management-1)
-  - [Infrastructure Management](#infrastructure-management)
-  - [Source Control and CI/CD](#source-control-and-cicd)
-  - [Documentation](#documentation)
-  - [Package Management](#package-management)
-- [Storage Architecture](#storage-architecture)
-- [Database Architecture](#database-architecture)
-- [Infrastructure Automation](#infrastructure-automation)
-- [Monitoring and Security Operations](#monitoring-and-security-operations)
-- [Development Roadmap](#development-roadmap)
-  - [Phase 1 — Infrastructure Foundation](#phase-1--infrastructure-foundation)
-  - [Phase 2 — Security and Monitoring](#phase-2--security-and-monitoring)
-  - [Phase 3 — Automation and CI/CD](#phase-3--automation-and-cicd)
-  - [Future — Kubernetes Architecture](#future--kubernetes-architecture)
-- [AI-Assisted Development](#ai-assisted-development)
-- [Documentation](#documentation-1)
-- [Project Status](#project-status)
+- [Key Technologies](#key-technologies)
+- [Project Structure](#project-structure)
+- [Roadmap](#roadmap)
 - [Lessons Learned](#lessons-learned)
-- [Future Improvements](#future-improvements)
-- [Disclaimer](#disclaimer)
+- [Contributing](#contributing)
 - [License](#license)
+
+---
+
+## About the Project
+
+The **Enterprise Reference Architecture** is a practical, open-source infrastructure project that demonstrates how modern enterprise IT concepts can be designed and implemented using FOSS technologies.
+The environment is built as a **self-hosted reference architecture and learning lab**, using modest hardware to model concepts commonly found in larger enterprise environments.
+The project focuses on:
+
+* **Network segmentation and microsegmentation**
+* **Identity and access management**
+* **Zero Trust and Zero Plaintext principles**
+* **Infrastructure as Code and automation**
+* **Containerized application platforms**
+* **Centralized secrets management**
+* **Security-oriented infrastructure design**
+* **Architecture documentation and reproducibility**
+
+The goal is not to reproduce an entire enterprise environment, but to create a **small, understandable, and reproducible architecture** that demonstrates how these technologies and principles can work together.
+
+> **Secure by design. Automated where practical. Documented by default.**
+
+For detailed architecture decisions, implementation details, diagrams, and operational documentation, see the [`docs/`](docs/) directory.
+
+
+## The Story Behind the Project
+
+...
+
+## Architecture Overview
+
+...
+
+## Key Technologies
+
+...
+
+## Project Structure
+
+...
+
+## Roadmap
+
+...
+
+## Lessons Learned
+
+...
+
+## Contributing
+
+...
+
+## License
