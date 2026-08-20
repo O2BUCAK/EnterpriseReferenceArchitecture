@@ -53,6 +53,12 @@ infrastructure, and automation.
 
 ## Architecture Overview
 
+The environment follows a layered enterprise architecture built around network segmentation, centralized identity, containerized applications, dedicated database services, and infrastructure automation.
+At the foundation, OPNsense provides network routing, firewalling, and VLAN-based segmentation. Core services are provided by FreeIPA, while application workloads run on Docker and persistent data is handled by PostgreSQL.
+Automation and infrastructure management are handled through Ansible and OpenTofu, with security services such as OpenBao, Keycloak, and Teleport supporting secrets management, authentication, and secure access.
+The detailed architecture, network design, infrastructure components, and security model are documented separately in the repository.
+
+**Architecture documentation:** [`docs/architecture/`](docs/architecture/)
 ...
 
 ## Key Technologies
