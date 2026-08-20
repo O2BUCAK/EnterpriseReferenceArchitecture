@@ -1,33 +1,33 @@
 # The Story Behind the Project
 
-## Nereden Geldim?
+## Where I Came From
 
-2009 yılında ilk kez çalışma hayatına atıldığımda Elektrik bölümü mezunuydum. Ancak çok kısa sürede elektrikle ilgili bir iş yapmak istemediğimi, bilgisayarları sevdiğimi ve kariyerimi bu alanda geliştirmek istediğimi fark ettim.
-Bu yüzden IT dünyasına en alt seviyeden başladım.
-İlk işlerimden birinde kablo çekmek, modem kurmak ve bağlantı problemlerini çözmek gibi işlerle uğraşıyordum. O dönem benim için sadece modem kurulumu gibi görünen işler, aslında Network'ün en temel kavramlarını öğrenmeye başladığım dönemdi. Modem yapılandırmaları, port yönlendirmeleri ve bağlantı problemleri üzerinden network'ün nasıl çalıştığını anlamaya başladım.
-Bir süre sonra kendimi daha sistematik şekilde geliştirmem gerektiğini düşünerek **Sistem Uzmanlığı eğitimi** aldım ve kariyerimi sistem yönetimi tarafında ilerletmeye karar verdim.
-Sonraki dönemde farklı sektörlerde çalışarak deneyim kazandım. Perakende sektöründe barkodlu sistemlerin kurulumu ve desteğinde görev aldım. Daha sonra sağlık sektöründe bir hastanede **Sistem Destek Uzmanı** olarak çalışmaya başladım.
-Burada son kullanıcı desteğinin yanında kurumsal IT altyapısının farklı parçalarıyla daha yakından tanışma fırsatı buldum. Temel seviyede **Active Directory, DNS, DHCP, Group Policy ve Switch VLAN** yapılandırmalarıyla çalışırken, aynı zamanda biyomedikal ve radyolojik cihazların hastane IT altyapısına entegrasyon süreçlerinde destek verdim.
-Daha sonra geçtiğim danışmanlık firmasında son kullanıcı desteğinin yanında **Citrix ve SCCM** süreçlerine dahil oldum. Aynı dönemde **Proxmox ve Nextcloud** gibi teknolojiler üzerinde Proof of Concept (POC) çalışmalarında bulunma fırsatım oldu.
-Bütün bu süreç boyunca farklı sistemlerin parçalarını gördüm, farklı teknolojilerle çalıştım ve özellikle sorun çözme konusunda ciddi bir deneyim kazandım.
-Fakat bir noktadan sonra kendime şu soruyu sormaya başladım:
-> **“Ben artık sadece sistemlerin çalışan parçalarını desteklemekle mi kalacağım, yoksa bu sistemlerin arkasındaki altyapıyı gerçekten tasarlayıp yönetebilecek seviyeye mi geleceğim?”**
+When I started my professional career in 2009, I was a graduate of an Electrical program. However, I quickly realized that I did not want to pursue a career in electrical work. I enjoyed working with computers and wanted to build my career in IT.
+So I started from the ground up.
+In one of my first jobs, I was involved in tasks such as running network cables, configuring modems, and troubleshooting connectivity issues. At the time, these may have seemed like simple modem installation tasks, but they were actually my first steps toward understanding the fundamentals of networking. Through modem configurations, port forwarding, and connectivity troubleshooting, I began to understand how networks actually work.
+After some time, I realized that I needed to develop myself in a more structured way. I completed a **Systems Administration training program** and decided to move my career toward system administration.
+I gained experience across different industries. In the retail sector, I worked with the installation and support of barcode-based systems. Later, I joined a hospital as a **System Support Specialist**.
+There, in addition to end-user support, I had the opportunity to work more closely with different parts of an enterprise IT infrastructure. I worked at a basic level with **Active Directory, DNS, DHCP, Group Policy, and switch VLAN configurations**, while also supporting the integration of biomedical and radiology equipment into the hospital's IT infrastructure.
+Later, I joined an IT consulting company, where I became involved in **Citrix and SCCM** processes in addition to end-user support. During the same period, I had the opportunity to work on Proof of Concept (POC) projects involving technologies such as **Proxmox and Nextcloud**.
+Throughout this journey, I have worked with different systems, technologies, and environments, and most importantly, developed significant experience in troubleshooting and problem-solving.
+But at some point, I started asking myself:
 
-## Neden Böyle Bir Projeye Başladım?
+> **"Am I going to keep supporting the working parts of systems, or am I going to reach a level where I can actually design and manage the infrastructure behind those systems?"**
 
-Bir noktadan sonra son kullanıcı destek tarafındaki kariyerimi değiştirmek için birilerinden fırsat veya destek beklememem gerektiğine karar verdim.
-Eğer farklı bir alana geçmek istiyorsam, bunu önce kendim yapmalıydım.
-Bu nedenle özellikle son bir yılda farklı konularda çok sayıda eğitim almaya, eksiklerimi kapatmaya ve sistem yönetimi, Linux, network, virtualization, automation, container teknolojileri ve güvenlik gibi alanlarda kendimi geliştirmeye başladım.
-Ancak yalnızca eğitim almanın yeterli olmadığını da fark ettim.
-Bir şeyleri gerçekten öğrenip öğrenmediğimi gösterebilmek için **yaptıklarımı ortaya koyabileceğim bir ortama** ihtiyacım vardı.
-Bir anlamda kendi adıma bir **“Show and Tell”** alanı oluşturmam gerektiğine inandım.
-Enterprise Reference Architecture projesi tam olarak bu ihtiyaçtan ortaya çıktı.
-Başlangıçta yalnızca bir Home Lab kurma fikriydi.
-Ancak zaman içerisinde farklı teknolojileri ayrı ayrı denemek yerine, bunların birbirleriyle nasıl çalıştığını görmek; Network, Identity Management, Database, Security, Containers, Automation ve Monitoring gibi bileşenleri tek bir mimari içerisinde bir araya getirmek istedim.
-Böylece proje basit bir Home Lab olmaktan çıkarak, **kurumsal bir IT mimarisini mümkün olduğunca küçük kaynaklarla ve mümkün olduğunca FOSS çözümler kullanarak yeniden oluşturmayı hedefleyen bir referans mimariye** dönüştü.
-Benim için bu proje yalnızca teknik bir laboratuvar değil.
-Bugüne kadar edindiğim yaklaşık 15 yıllık IT deneyimini, bundan sonra gitmek istediğim **Infrastructure, Automation, DevOps ve ilerleyen aşamalarda AI Infrastructure** yönünde uygulamaya dökme alanı.
-Burada öğrendiklerimi sadece anlatmak değil, **kurmak, bozmak, yeniden kurmak, test etmek ve neden böyle yaptığımı açıklayabilmek** istiyorum.
-Kısacası:
-> **15 yıl boyunca farklı sistemlerin çalışan parçalarına dokundum. Şimdi o sistemlerin tamamının nasıl bir araya geldiğini kendi ellerimle öğreniyorum.**
-Ve bu repository, bunun **Show and Tell** kısmı.
+## Why I Started This Project
+
+At some point, I decided that I should stop waiting for someone else to give me an opportunity to change my career path.
+If I wanted to move into a different area, I needed to start by doing it myself.
+Over the past year in particular, I began taking courses, filling gaps in my knowledge, and developing my skills in areas such as system administration, Linux, networking, virtualization, automation, container technologies, and security.
+However, I also realized that simply taking courses was not enough.
+To prove to myself that I was actually learning, I needed a place where I could **build and demonstrate what I had learned**.
+In a way, I needed to create my own **"Show and Tell"** environment.
+The **Enterprise Reference Architecture** project grew directly out of that need.
+It started as a simple idea for building a Home Lab. Over time, however, I wanted to go beyond experimenting with individual technologies in isolation. I wanted to understand how they work together and bring components such as **Networking, Identity Management, Databases, Security, Containers, Automation, and Monitoring** together within a single architecture.
+As a result, the project evolved from a simple Home Lab into a **reference architecture designed to recreate an enterprise IT environment using modest resources and, wherever possible, FOSS solutions**.
+For me, this project is more than just a technical laboratory.
+It is a way to turn approximately **15 years of IT experience** into practical work aligned with where I want to go next: **Infrastructure, Automation, DevOps, and eventually AI Infrastructure**.
+Here, I do not want to simply explain what I have learned. I want to **build it, break it, rebuild it, test it, and be able to explain why I designed it the way I did**.
+In short:
+> **For 15 years, I have worked with the individual working parts of different systems. Now I am learning how all those parts come together by building the whole thing myself.**
+And this repository is the **Show and Tell** part of that journey.
