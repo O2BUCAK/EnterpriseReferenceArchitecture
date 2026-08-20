@@ -45,6 +45,10 @@ For detailed architecture decisions, implementation details, diagrams, and opera
 
 ## The Story Behind the Project
 
+This project grew from a long-term journey through IT support, systems,
+infrastructure, and automation.
+
+[Read the story behind the project →](docs/project/story.md)
 ...
 
 ## Architecture Overview
