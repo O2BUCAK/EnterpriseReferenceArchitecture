@@ -191,20 +191,17 @@ The project follows these principles throughout the design:
 
 ---
 
-## Related Documentation
-
-Detailed implementation documents are maintained separately from this overview.
-
-| Documentation                                                                | Description                                                |
-| ---------------------------------------------------------------------------- | ---------------------------------------------------------- |
-| [`network.md`](network.md)                                                   | Network topology, VLANs, segmentation, and firewall design |
-| [`security.md`](security.md)                                                 | Security architecture, controls, and security principles   |
-| [`services.md`](services.md)                                                 | Core infrastructure and application services               |
-| [`../infrastructure/virtualization.md`](../infrastructure/virtualization.md) | Virtualization platform and virtual machine architecture   |
-| [`../infrastructure/storage.md`](../infrastructure/storage.md)               | Storage architecture and disk layout                       |
-| [`../infrastructure/systems.md`](../infrastructure/systems.md)               | Operating systems and system-level configuration           |
-| [`../operations/automation.md`](../operations/automation.md)                 | Automation and infrastructure management                   |
-| [`../operations/monitoring.md`](../operations/monitoring.md)                 | Monitoring and observability                               |
-| [`../operations/backup.md`](../operations/backup.md)                         | Backup and recovery architecture                           |
+| Documentation | Description |
+| --- | --- |
+| [`../network/`](../network/) | Network topology, VLANs, segmentation, and firewall design |
+| [`../security/`](../security/) | Security architecture, controls, and security principles |
+| [`../vm-design/`](../vm-design/) | Virtual machine design, roles, and system specifications |
+| [`../resource-matrix/`](../resource-matrix/) | VM resource allocation and hardware resource planning |
+| [`../operations/`](../operations/) | Operational procedures, monitoring, backup, and maintenance |
+| [`../project/`](../project/) | Project background and development context |
+| [`../../ansible/`](../../ansible/) | Ansible automation and configuration management |
+| [`../../docker/`](../../docker/) | Docker application platform and container configurations |
+| [`../../opentofu/`](../../opentofu/) | OpenTofu infrastructure as code |
+| [`../../scripts/`](../../scripts/) | Supporting Bash and PowerShell scripts |
 
 > This document describes the architecture at a high level. Implementation-specific decisions, configuration details, and operational procedures should be documented in the corresponding domain documentation.
