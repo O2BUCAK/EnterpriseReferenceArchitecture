@@ -87,37 +87,25 @@ EnterpriseReferenceArchitecture/
 ├── README.md
 ├── LICENSE
 │
-├── docs/
-│   ├── architecture/
-│   │   ├── overview.md
-│   │   ├── network.md
-│   │   ├── security.md
-│   │   └── services.md
-│   │
-│   ├── infrastructure/
-│   │   ├── virtualization.md
-│   │   ├── storage.md
-│   │   └── systems.md
-│   │
-│   ├── operations/
-│   │   ├── monitoring.md
-│   │   ├── backup.md
-│   │   └── automation.md
-│   │
-│   └── decisions/
-│       └── adr/
+├── ansible/
+├── docker/
+├── opentofu/
 │
-├── diagrams/
-│   ├── architecture/
-│   ├── network/
-│   └── security/
+├── scripts/
+│   ├── bash/
+│   └── powershell/
 │
-├── automation/
-│   ├── ansible/
-│   └── opentofu/
-│
-└── examples/
-    └── configurations/
+└── docs/
+    ├── architecture/
+    │   └── overview.md
+    ├── network/
+    ├── security/
+    ├── vm-design/
+    ├── resource-matrix/
+    │   └── vm-resource-matrix.md
+    ├── operations/
+    └── project/
+        └── story.md
 ```
 
 The repository follows a documentation-first approach: **README.md provides the project overview, while `docs/` contains detailed architecture and implementation documentation.**
