@@ -47,6 +47,7 @@ The environment is organized into several logical infrastructure and network dom
 The architecture separates infrastructure responsibilities into distinct network segments rather than operating all services within a single trusted network.
 Each VLAN represents an independent security and trust boundary. Communication between segments is controlled by OPNsense and should be explicitly permitted only when required by the architecture.
 The **Database VLAN (VLAN 30)** is an independent network segment. Application workloads in **VLAN 40** may access database services only through explicitly defined firewall and network policies.
+
 ---
 
 ## Core Components
@@ -60,6 +61,7 @@ The **Database VLAN (VLAN 30)** is an independent network segment. Application w
 | `app01`   | Containerized application platform          | VLAN 40  |
 
 Each system has a defined responsibility, allowing the architecture to demonstrate separation of concerns and controlled communication between infrastructure domains.
+
 ---
 
 ## Network Architecture
