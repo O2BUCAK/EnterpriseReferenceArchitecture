@@ -117,7 +117,7 @@ VLAN 30
 ```
 
 This separation demonstrates a common enterprise architecture pattern in which application workloads and database services are isolated from one another.
-The database storage design and PostgreSQL-specific configuration are documented separately under the infrastructure documentation.
+The database storage design and PostgreSQL-specific configuration are documented separately under the VM design and resource documentation.
 
 ---
 
@@ -191,17 +191,19 @@ The project follows these principles throughout the design:
 
 ---
 
-| Documentation | Description |
-| --- | --- |
-| [`../network/`](../network/) | Network topology, VLANs, segmentation, and firewall design |
-| [`../security/`](../security/) | Security architecture, controls, and security principles |
-| [`../vm-design/`](../vm-design/) | Virtual machine design, roles, and system specifications |
-| [`../resource-matrix/`](../resource-matrix/) | VM resource allocation and hardware resource planning |
-| [`../operations/`](../operations/) | Operational procedures, monitoring, backup, and maintenance |
-| [`../project/`](../project/) | Project background and development context |
-| [`../../ansible/`](../../ansible/) | Ansible automation and configuration management |
-| [`../../docker/`](../../docker/) | Docker application platform and container configurations |
-| [`../../opentofu/`](../../opentofu/) | OpenTofu infrastructure as code |
-| [`../../scripts/`](../../scripts/) | Supporting Bash and PowerShell scripts |
+## Related Documentation
+
+| Documentation                                | Description                                                 |
+| -------------------------------------------- | ----------------------------------------------------------- |
+| [`../network/`](../network/)                 | Network topology, VLANs, segmentation, and firewall design  |
+| [`../security/`](../security/)               | Security architecture, controls, and security principles    |
+| [`../vm-design/`](../vm-design/)             | Virtual machine design, roles, and system specifications    |
+| [`../resource-matrix/`](../resource-matrix/) | VM resource allocation and hardware resource planning       |
+| [`../operations/`](../operations/)           | Operational procedures, monitoring, backup, and maintenance |
+| [`../project/`](../project/)                 | Project background and development context                  |
+| [`../../ansible/`](../../ansible/)           | Ansible automation and configuration management             |
+| [`../../docker/`](../../docker/)             | Docker application platform and container configurations    |
+| [`../../opentofu/`](../../opentofu/)         | OpenTofu infrastructure as code                             |
+| [`../../scripts/`](../../scripts/)           | Supporting Bash and PowerShell scripts                      |
 
 > This document describes the architecture at a high level. Implementation-specific decisions, configuration details, and operational procedures should be documented in the corresponding domain documentation.
