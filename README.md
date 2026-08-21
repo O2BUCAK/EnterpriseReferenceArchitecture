@@ -1,7 +1,5 @@
 # Enterprise Reference Architecture
 
-## Corporate Reference Architecture
-
 > A FOSS-first enterprise IT reference architecture built on modest hardware,
 > designed as a practical Home Lab and learning environment.
 
@@ -81,7 +79,6 @@ The architecture follows **FOSS-first**, **Zero Trust**, **Zero Plaintext**, **n
 ...
 
 ## Project Structure
-## Project Structure
 
 The repository is organized to keep the high-level architecture easy to understand while moving implementation details into dedicated documentation.
 
@@ -127,7 +124,6 @@ The repository follows a documentation-first approach: **README.md provides the 
 ...
 
 ## Roadmap
-## Roadmap
 
 The project is developed incrementally, with each phase building toward a more complete enterprise-style environment.
 
@@ -144,7 +140,6 @@ The project is developed incrementally, with each phase building toward a more c
 > **Note:** The roadmap is intentionally iterative. Components may be added, replaced, or redesigned as the architecture evolves and new technologies are evaluated.
 ...
 
-## Lessons Learned
 ## Lessons Learned
 
 Building this architecture has reinforced several practical lessons:
@@ -204,7 +199,6 @@ Please keep pull requests focused and explain:
 By contributing, you agree that your contributions may be incorporated into the project under its existing license.
 ...
 
-## License
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
