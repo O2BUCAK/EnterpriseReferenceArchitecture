@@ -41,23 +41,23 @@ The environment is organized into several logical infrastructure and network dom
                                       ▲              │
                                       │              │
                                       └──────────────┘
-                                   Controlled Access
+                                  Controlled Database Access
 ```
 
 The architecture separates infrastructure responsibilities into distinct network segments rather than operating all services within a single trusted network.
 Each VLAN represents an independent security and trust boundary. Communication between segments is controlled by OPNsense and should be explicitly permitted only when required by the architecture.
-The **Database VLAN (VLAN 30)** is an independent network segment. Application workloads in **VLAN 40** may access database services only through explicitly defined network policies.
+The **Database VLAN (VLAN 30)** is an independent network segment. Application workloads in **VLAN 40** may access database services only through explicitly defined firewall and network policies.
 ---
 
 ## Core Components
 
-| Component | Role                                       | Network  |
-| --------- | ------------------------------------------ | -------- |
-| `fw01`    | Firewall, routing and network segmentation | OPNsense |
-| `auto01`  | Infrastructure automation and IaC          | VLAN 10  |
-| `ipa01`   | Identity and core services                 | VLAN 20  |
-| `db01`    | PostgreSQL database services               | VLAN 30  |
-| `app01`   | Containerized application platform         | VLAN 40  |
+| Component | Role                                        | Network  |
+| --------- | ------------------------------------------- | -------- |
+| `fw01`    | Firewall, routing, and network segmentation | OPNsense |
+| `auto01`  | Infrastructure automation and IaC           | VLAN 10  |
+| `ipa01`   | Identity and core services                  | VLAN 20  |
+| `db01`    | PostgreSQL database services                | VLAN 30  |
+| `app01`   | Containerized application platform          | VLAN 40  |
 
 Each system has a defined responsibility, allowing the architecture to demonstrate separation of concerns and controlled communication between infrastructure domains.
 ---
@@ -75,15 +75,17 @@ The network is divided into dedicated VLANs according to infrastructure roles.
 
 OPNsense acts as the network security boundary and controls traffic between these segments.
 The goal is not simply to create VLANs, but to demonstrate **controlled communication between security zones based on workload requirements**.
+Detailed network topology, addressing, VLAN configuration, and firewall policies are documented separately.
+
 ---
 
 ## Application Platform
 
 The application layer is hosted on `app01` using Docker.
-The platform is intended to host infrastructure and enterprise-oriented services such as:
+The platform is intended to host infrastructure and enterprise-oriented services covering areas such as:
 
 * Reverse proxy and web services
-* Identity and access management
+* Identity and authentication
 * Secrets management
 * Privileged access
 * Infrastructure inventory
@@ -92,38 +94,45 @@ The platform is intended to host infrastructure and enterprise-oriented services
 * Network and infrastructure management
 
 Applications are treated as independent workloads rather than being installed directly into the host operating system wherever practical.
+The application platform is intentionally separated from the database layer. Persistent application data requiring PostgreSQL is stored on `db01`.
+
 ---
 
 ## Data Layer
 
-Persistent application data is separated from the application platform.
+Persistent database services are separated from the application platform.
 `db01` provides PostgreSQL database services on the dedicated **Database VLAN (VLAN 30)**.
 The database layer is an independent architectural and network domain. Application workloads running on **VLAN 40** communicate with the database layer only through explicitly permitted network flows.
+
 ```text
 Application Layer
+VLAN 40
       │
-      │ Controlled database access
+      │ Explicitly permitted database access
       ▼
 Database Layer
 VLAN 30
 ```
 
 This separation demonstrates a common enterprise architecture pattern in which application workloads and database services are isolated from one another.
+The database storage design and PostgreSQL-specific configuration are documented separately under the infrastructure documentation.
+
 ---
 
 ## Identity and Access
 
 Identity is treated as a central architectural capability rather than an application-specific feature.
-FreeIPA provides the core identity services, while additional services can integrate with the identity layer for authentication and authorization.
-The architecture also includes dedicated components for:
+`ipa01` provides the core identity services through FreeIPA. Additional services can integrate with the identity layer for authentication and authorization where appropriate.
+The architecture includes dedicated capabilities for:
 
 * Identity management
-* Authentication
+* Authentication and authorization
 * Secrets management
 * Privileged access
 * Service-to-service credentials
 
 This supports the project's **Zero Trust** and **Zero Plaintext** principles.
+
 ---
 
 ## Automation and Infrastructure as Code
@@ -133,6 +142,8 @@ Infrastructure management is separated from application workloads.
 * **Ansible** for configuration and operational automation
 * **OpenTofu** for infrastructure as code
 The objective is to make infrastructure changes reproducible, documented, and increasingly automated rather than dependent on manual configuration.
+Automation is treated as an architectural capability that spans the infrastructure rather than as a workload belonging to a single application segment.
+
 ---
 
 ## Security Architecture
@@ -148,7 +159,7 @@ Access should be explicitly permitted based on identity, role, service requireme
 ### Zero Plaintext
 
 Sensitive credentials and secrets should not be stored or transmitted in plaintext where secure alternatives are available.
-OpenBao is used as the foundation for secrets management.
+OpenBao is used as the foundation for centralized secrets management.
 
 ### Microsegmentation
 
@@ -158,6 +169,7 @@ Communication between segments should be limited to explicitly required flows.
 ### Least Privilege
 
 Users, services, and infrastructure components should receive only the access required to perform their intended functions.
+
 ---
 
 ## Architectural Principles
@@ -174,21 +186,23 @@ The project follows these principles throughout the design:
 8. **Documentation as code** — Architecture and operational knowledge should live alongside the implementation.
 9. **Practicality** — Enterprise concepts should remain achievable on modest hardware.
 10. **Reproducibility** — The environment should be understandable and rebuildable by another engineer.
+
 ---
 
 ## Related Documentation
 
 Detailed implementation documents are maintained separately from this overview.
 
-| Documentation                           | Description                                              |
-| --------------------------------------- | -------------------------------------------------------- |
-| [`network/`](../network/)               | Network topology, VLANs and firewall design              |
-| [`infrastructure/`](../infrastructure/) | Hosts, virtual machines and infrastructure configuration |
-| [`security/`](../security/)             | Security architecture and security controls              |
-| [`identity/`](../identity/)             | Identity and access architecture                         |
-| [`applications/`](../applications/)     | Application platform and deployed services               |
-| [`data/`](../data/)                     | Database and persistent storage architecture             |
-| [`automation/`](../automation/)         | Ansible and OpenTofu automation                          |
-| [`operations/`](../operations/)         | Operational procedures and maintenance                   |
+| Documentation                                                                | Description                                                |
+| ---------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| [`network.md`](network.md)                                                   | Network topology, VLANs, segmentation, and firewall design |
+| [`security.md`](security.md)                                                 | Security architecture, controls, and security principles   |
+| [`services.md`](services.md)                                                 | Core infrastructure and application services               |
+| [`../infrastructure/virtualization.md`](../infrastructure/virtualization.md) | Virtualization platform and virtual machine architecture   |
+| [`../infrastructure/storage.md`](../infrastructure/storage.md)               | Storage architecture and disk layout                       |
+| [`../infrastructure/systems.md`](../infrastructure/systems.md)               | Operating systems and system-level configuration           |
+| [`../operations/automation.md`](../operations/automation.md)                 | Automation and infrastructure management                   |
+| [`../operations/monitoring.md`](../operations/monitoring.md)                 | Monitoring and observability                               |
+| [`../operations/backup.md`](../operations/backup.md)                         | Backup and recovery architecture                           |
 
-> This document describes the architecture at a high level. Implementation-specific decisions and configuration details should be documented in the corresponding domain documentation.
+> This document describes the architecture at a high level. Implementation-specific decisions, configuration details, and operational procedures should be documented in the corresponding domain documentation.
