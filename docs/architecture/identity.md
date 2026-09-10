@@ -1,72 +1,75 @@
 # Identity Architecture
 
-> Identity architecture for the Enterprise Reference Architecture, covering centralized identity, authentication, authorization, service identities, and privileged access.
+> Target identity architecture for the Enterprise Reference Architecture.
 
-## Purpose
+## Status
 
-This document defines the identity architecture of the Enterprise Reference Architecture.
-The identity platform is designed around **centralized identity, least privilege, Zero Trust, and separation of authentication from application authorization**.
-The architecture uses open-source technologies and avoids dependence on a traditional Microsoft Active Directory domain.
+**Planned architecture.**
+
+This document describes the intended identity model. The identity components listed below must not be interpreted as implemented until they are actually installed, configured, and tested in the lab.
+
+## Status Convention
+
+| Status | Meaning |
+|---|---|
+| **Implemented** | Installed, configured, and tested in the lab |
+| **Planned** | Defined in the architecture but not yet implemented |
+| **Future** | Deferred to a later phase |
+| **Documented** | Design decision only |
 
 ---
 
-## Identity Principles
+## Purpose
 
-The identity architecture follows these principles:
+The identity architecture is designed around centralized identity, least privilege, Zero Trust, separation of authentication from application authorization, and auditable access.
 
-* **Centralized Identity** — User identities are managed from a single authoritative identity service.
-* **Single Sign-On (SSO)** — Applications should use centralized authentication where practical.
-* **Least Privilege** — Users and services receive only the permissions required for their responsibilities.
-* **Zero Trust** — Authentication and authorization are continuously evaluated rather than implicitly trusted based on network location.
-* **No Shared Accounts** — Individual administrative and user identities are preferred over shared credentials.
-* **No Plaintext Secrets** — Passwords, API keys, tokens, and service credentials must not be stored in plaintext configuration files.
-* **Separation of Duties** — Identity administration, infrastructure administration, and application administration should be logically separated.
-* **Service Identity Isolation** — Applications and automation use dedicated service identities rather than personal accounts.
-* **Auditable Access** — Authentication and privileged access should produce logs that can be reviewed and correlated.
+The architecture intentionally avoids dependence on Microsoft Active Directory and favors FOSS technologies.
 
 ---
 
 ## Identity Components
 
-| Component | Role |
-|---|---|
-| **FreeIPA** | Central identity, authentication, authorization, Kerberos, LDAP, and host identity |
-| **Keycloak** | Application-focused identity provider and SSO using modern protocols |
-| **OpenBao** | Secrets management and machine/application credentials |
-| **Teleport CE** | Secure privileged access to infrastructure |
-| **NetBox** | Source of truth for infrastructure and network inventory |
-| **Ansible** | Identity-aware infrastructure automation |
-| **PostgreSQL** | Application data storage; authentication is delegated to the appropriate identity layer where supported |
+| Component | Intended Role | Status |
+|---|---|---|
+| **FreeIPA** | Central infrastructure identity, LDAP, Kerberos and host identity | **Planned** |
+| **Keycloak** | Application identity provider and SSO | **Planned** |
+| **OpenBao** | Secrets management | **Planned** |
+| **Teleport CE** | Privileged infrastructure access | **Planned** |
+| **NetBox** | Infrastructure and network source of truth | **Planned** |
+| **Ansible** | Identity-aware infrastructure automation | **Planned** |
+| **PostgreSQL** | Application data storage | **Planned** |
 
 ---
 
-## Identity Authority
+## Identity Authority — Planned
 
 ### FreeIPA
 
-FreeIPA is the primary infrastructure identity platform.
+FreeIPA is the planned primary infrastructure identity platform.
 
-It provides centralized user and group management, LDAP directory services, Kerberos authentication, host enrollment, host-based access control, sudo policy management, SSH key management, certificate management, and centralized identity for Linux systems.
+The intended `ipa01` VM will provide centralized user and group management, LDAP, Kerberos, host enrollment, host-based access control, sudo policy management, SSH key management, certificate management, and Linux identity services.
 
-The primary identity server is `ipa01`, running on Fedora Linux.
-
-FreeIPA is responsible primarily for **infrastructure identity**, rather than directly managing every application's user database.
+`ipa01` is an architectural definition, not a statement that the VM is currently deployed.
 
 ---
 
-## Application Identity
+## Application Identity — Planned
 
 ### Keycloak
 
-Keycloak provides application-oriented identity and Single Sign-On.
+Keycloak is planned as the application-oriented identity and Single Sign-On platform.
 
-Applications should integrate with Keycloak using standards such as:
+Applications should integrate through standards such as:
 
 * OpenID Connect (OIDC)
 * OAuth 2.0
 * SAML 2.0 where required
 
-The application identity flow is:
+Where appropriate, Keycloak is intended to use FreeIPA/LDAP as an external identity source.
+
+---
+
+## Planned Authentication Flow
 
 ```text
 User
@@ -78,95 +81,44 @@ Application
 Keycloak
   |
   v
-Identity / Authentication
+FreeIPA / Identity Source
 ```
 
-Where appropriate, Keycloak can use FreeIPA/LDAP as an external identity source.
-
-This creates a separation between infrastructure identity and application identity, allowing the two domains to evolve independently.
+The exact flow will be validated during implementation.
 
 ---
 
-## Authentication Flow
+## Linux Host Identity — Planned
 
-A typical user authentication flow is:
+Linux servers participating in centralized identity are intended to be enrolled into FreeIPA.
 
-```text
-                    +----------------+
-                    |     User       |
-                    +-------+--------+
-                            |
-                            v
-                    +-------+--------+
-                    |  Application   |
-                    +-------+--------+
-                            |
-                            v
-                    +-------+--------+
-                    |   Keycloak     |
-                    +-------+--------+
-                            |
-                            v
-                    +-------+--------+
-                    |    FreeIPA     |
-                    +----------------+
-```
-
-The exact flow depends on the application.
-Applications that support OIDC should preferably authenticate through Keycloak rather than implementing independent authentication systems.
+Local accounts may remain necessary for initial installation, emergency recovery, break-glass access, or system-specific requirements.
 
 ---
 
-## Linux Host Identity
+## Administrative Access — Planned
 
-Linux servers participating in centralized identity should be enrolled into FreeIPA.
-Infrastructure access should be controlled through identity and policy rather than manually maintained local accounts wherever practical.
-
-Local accounts may still exist for initial installation, emergency recovery, break-glass access, or system-specific requirements. Such accounts must be tightly controlled and documented.
-
----
-
-## Administrative Access
-
-Administrative access is separated from normal application access.
-
-The preferred administrative path is:
+Teleport CE is planned as the controlled administrative access layer.
 
 ```text
 Administrator
       |
       v
-  Teleport
+  Teleport CE
       |
-      +--------> Linux Hosts
-      |
-      +--------> Infrastructure Services
+      +----> Linux Hosts
+      +----> Infrastructure Services
 ```
 
-Teleport provides a controlled access layer for privileged infrastructure connections and supports centralized access control and auditing.
+The access model, authentication method, and auditing capabilities will be validated when Teleport is implemented.
 
 ---
 
-## Privileged Identity
+## Service Identities — Planned
 
-Privileged access follows these principles:
+Applications and automation should use dedicated service identities rather than personal accounts.
 
-1. Administrative accounts are separate from normal user identities.
-2. Privileged access is granted only when required.
-3. Access should be attributable to an individual.
-4. Direct root access is minimized.
-5. Sudo policies are centrally managed where possible.
-6. Administrative sessions should be auditable.
-7. Credentials should not be permanently embedded in scripts or configuration files.
-
----
-
-## Service Identities
-
-Applications and automation should not use personal user accounts.
-Each significant service should have a dedicated identity.
-
-Examples:
+Examples include:
 
 ```text
 svc-keycloak
@@ -176,44 +128,32 @@ svc-ansible
 svc-backup
 ```
 
-Service credentials should be stored and distributed through **OpenBao** where supported.
+These are design examples only.
 
 ---
 
-## Secrets Management
+## Secrets Management — Planned
 
-Identity and secrets management are deliberately separated.
-FreeIPA manages identities and authentication.
-Keycloak manages application-oriented authentication and SSO.
-OpenBao manages secrets.
+OpenBao is planned for centralized management of passwords, API tokens, database credentials, certificates, encryption keys, and service credentials.
+
+The intended separation is:
 
 ```text
-+------------------+
-|     FreeIPA      |
-| Identity/Auth    |
-+--------+---------+
-         |
-         v
-+------------------+
-|    Keycloak      |
-| Application SSO  |
-+------------------+
-
-+------------------+
-|     OpenBao      |
-| Secrets / Keys   |
-+------------------+
+FreeIPA   -> Infrastructure Identity
+Keycloak  -> Application SSO
+OpenBao   -> Secrets
+Teleport  -> Privileged Access
 ```
 
-Passwords, API tokens, certificates, database credentials, and other sensitive values should be stored in OpenBao whenever practical.
+No claim is made that these services are currently deployed.
 
 ---
 
-## Groups and Authorization
+## Groups and Authorization — Design
 
-Authorization should be based on groups and roles rather than individual permissions whenever possible.
+Authorization should be based on groups and roles rather than individual permissions wherever practical.
 
-Example infrastructure groups:
+Example groups:
 
 ```text
 Users
@@ -225,140 +165,85 @@ Users
  +-- ReadOnly-Admins
 ```
 
-Applications can implement their own roles through Keycloak, for example `platform-admin`, `application-admin`, `developer`, `auditor`, and `readonly`.
-
-Group and role names should remain consistent across systems to simplify administration and auditing.
+These are planned authorization structures, not current lab accounts.
 
 ---
 
-## Identity Lifecycle
-
-The identity lifecycle follows:
+## Identity Lifecycle — Design
 
 ```text
 Create
   |
-  v
 Assign Groups/Roles
   |
-  v
 Authenticate
   |
-  v
 Authorize
   |
-  v
 Audit
   |
-  v
 Review
   |
-  v
 Disable
   |
-  v
 Remove
 ```
 
-When a user leaves the environment, access should be revoked from the central identity system first. Dependent application and privileged access should then be reviewed.
+The lifecycle will be validated and refined during implementation.
 
 ---
 
-## Break-Glass Access
+## Break-Glass Access — Design
 
-Emergency access must remain possible even if the central identity platform is unavailable.
+Emergency access should remain possible if centralized identity is unavailable.
 
-Break-glass access should:
-
-* Be limited to emergency use
-* Use dedicated credentials
-* Be protected separately from normal credentials
-* Be documented
-* Be audited after use
-* Not be used for routine administration
-
-The existence of break-glass access must not become a reason to bypass centralized identity.
+Break-glass access should be limited, separately protected, documented, and audited after use.
 
 ---
 
-## Identity and Network Segmentation
-
-Identity services are located within the infrastructure security model rather than being treated as universally trusted services.
-
-The architecture separates user, server, management, database, application, and security/infrastructure networks.
-Network location alone does not grant access.
-
-Firewall policies should explicitly permit only the required communication between these services.
-
----
-
-## Identity Dependencies
+## Dependencies
 
 ```text
-                    +----------------+
-                    |    FreeIPA     |
-                    +-------+--------+
-                            |
-                +-----------+-----------+
-                |                       |
-                v                       v
-           Linux Hosts              Keycloak
-                                        |
-                                        v
-                                  Applications
+                    FreeIPA (Planned)
+                           |
+                    +------+------+
+                    |             |
+                    v             v
+             Linux Hosts      Keycloak
+                                  |
+                                  v
+                            Applications
 
-                    +----------------+
-                    |    OpenBao     |
-                    +-------+--------+
-                            |
-              +-------------+-------------+
-              |             |             |
-              v             v             v
-          Applications   Automation    Services
+                    OpenBao (Planned)
+                           |
+              +------------+------------+
+              |            |            |
+              v            v            v
+         Applications  Automation    Services
 
-                    +----------------+
-                    |   Teleport     |
-                    +-------+--------+
-                            |
-                            v
-                    Administrative
-                       Access
+                   Teleport CE (Planned)
+                           |
+                           v
+                   Administrative Access
 ```
 
 ---
 
 ## Security Considerations
 
-The identity architecture must protect against credential theft, password reuse, privilege escalation, unauthorized administrative access, service account abuse, token leakage, hard-coded credentials, excessive permissions, orphaned accounts, and uncontrolled local accounts.
+The target identity architecture is intended to reduce credential theft, privilege escalation, unauthorized administrative access, service-account abuse, hard-coded credentials, excessive permissions, orphaned accounts, and uncontrolled local accounts.
 
-Recommended controls include strong authentication policies, MFA where supported, centralized logging, short-lived credentials where practical, role-based access control, regular access reviews, secure secret storage, administrative session auditing, and network-level access controls.
-
----
-
-## Operational Guidelines
-
-Identity-related configuration should be managed as infrastructure code wherever practical.
-
-Changes should be:
-
-1. Defined in version-controlled configuration.
-2. Reviewed before deployment.
-3. Applied through automation where practical.
-4. Tested before production-like deployment.
-5. Logged and auditable.
-
-Credentials must never be committed to the public repository.
-Public documentation should use placeholders such as `example.com` rather than real internal domains, usernames, addresses, or credentials.
+Controls such as MFA, RBAC, centralized logging, short-lived credentials, access reviews, secure secret storage, and administrative session auditing should be implemented and validated as the lab progresses.
 
 ---
 
 ## Design Summary
 
-| Layer | Technology | Responsibility |
+| Layer | Technology | Status |
 |---|---|---|
-| Infrastructure Identity | FreeIPA | Users, groups, hosts, Kerberos, LDAP, Linux access |
-| Application Identity | Keycloak | SSO, OIDC/OAuth2, application authentication |
-| Secrets | OpenBao | Passwords, tokens, keys, certificates, application secrets |
-| Privileged Access | Teleport CE | Controlled administrative access and session auditing |
+| Infrastructure Identity | FreeIPA | **Planned** |
+| Application Identity | Keycloak | **Planned** |
+| Secrets | OpenBao | **Planned** |
+| Privileged Access | Teleport CE | **Planned** |
 
-The resulting model keeps **identity, application authentication, secrets, and privileged access as distinct security domains**, while allowing them to work together as a coherent enterprise identity architecture.
+This document defines the **target identity architecture**, not the current implementation state.
