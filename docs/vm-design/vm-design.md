@@ -4,10 +4,14 @@
 
 ## Purpose
 
-This document defines the virtual machine architecture, resource allocation, storage layout, and Proxmox configuration standards used by the Enterprise Reference Architecture.
-The environment demonstrates enterprise infrastructure principles on modest hardware while maintaining clear separation between network security, identity, database, application, and automation workloads.
+This document defines the **reference design** for virtual machines, resource allocation, storage layout and Proxmox configuration.
 
-The VM design follows separation of responsibilities, least privilege, predictable resource allocation, consistent storage architecture, network segmentation, workload-specific storage sizing, infrastructure automation, reproducibility, and efficient use of limited hardware resources.
+> [!IMPORTANT]
+> This document describes architecture and planned sizing. It is **not a live inventory**.
+>
+> **Implemented in the laboratory:** Proxmox VE and the OPNsense firewall VM.
+>
+> The remaining VMs and application services described below are **Planned** unless explicitly documented as implemented.
 
 ---
 
@@ -18,26 +22,26 @@ The virtualization platform is **Proxmox VE**.
 ```text
 Physical Host
 └── Proxmox VE
-    ├── fw01
-    ├── ipa01
-    ├── db01
-    ├── app01
-    └── auto01
+    ├── fw01       [Implemented]
+    ├── ipa01      [Planned]
+    ├── db01       [Planned]
+    ├── app01      [Planned]
+    └── auto01     [Planned]
 ```
 
-Proxmox is responsible for VM lifecycle management, virtual CPU and memory allocation, virtual networking, virtual storage, VM isolation, backup/snapshot capabilities, and QEMU Guest Agent integration.
+The target design separates firewalling, identity, database, application and automation responsibilities.
 
 ---
 
-# VM Inventory
+# VM Design Matrix
 
-| VM | Operating System | Primary Role |
-|---|---|---|
-| `fw01` | OPNsense | Firewall, routing and network security |
-| `ipa01` | Fedora | FreeIPA identity and authentication |
-| `db01` | Pardus | PostgreSQL database |
-| `app01` | Ubuntu Server | Docker application platform |
-| `auto01` | RHEL | Ansible and OpenTofu automation |
+| VM | Operating System | Primary Role | Status |
+|---|---|---|---|
+| `fw01` | OPNsense | Firewall, routing and network security | **Implemented** |
+| `ipa01` | Fedora Server | FreeIPA identity and authentication | **Planned** |
+| `db01` | Pardus Server | PostgreSQL database | **Planned** |
+| `app01` | Ubuntu Server | Docker application platform | **Planned** |
+| `auto01` | RHEL | Ansible and OpenTofu automation | **Planned** |
 
 Each VM has a clearly defined primary responsibility. The architecture intentionally avoids combining unrelated infrastructure services into a single VM.
 
@@ -47,9 +51,15 @@ Each VM has a clearly defined primary responsibility. The architecture intention
 
 VM names use the role-based convention `<role><number>`.
 
-Examples: `fw01`, `ipa01`, `db01`, `app01`, `auto01`.
+```text
+fw01
+ipa01
+db01
+app01
+auto01
+```
 
-The numeric suffix allows additional instances such as `ipa02`, `db02`, or `app02` if future requirements call for redundancy or horizontal scaling.
+The old names `docker01` and `rhel01` are deprecated. They must not be used in new documentation or configuration.
 
 ---
 
@@ -57,50 +67,53 @@ The numeric suffix allows additional instances such as `ipa02`, `db02`, or `app0
 
 ## fw01 — Firewall
 
-`fw01` provides firewalling, routing, NAT, network segmentation, inter-network policy enforcement, DHCP where required, and DNS forwarding/resolution where required using OPNsense.
+**Status: Implemented**
 
-`fw01` is a dedicated network appliance and does **not** follow the standard Linux VM storage profile.
+`fw01` is the OPNsense firewall/router VM used for the network-security role. The Linux VM storage model does not apply to this appliance.
+
+Reference allocation: **2 vCPU / 4 GiB RAM / 40 GiB storage**.
 
 ## ipa01 — Identity
 
-`ipa01` provides centralized identity and authentication using FreeIPA, including identity management, authentication, authorization, Kerberos, LDAP, host enrollment, identity-related DNS integration, and centralized access control.
+**Status: Planned**
 
-Storage baseline: 20 GiB OS disk + 20 GiB data disk.
+`ipa01` is the planned Fedora Server VM for FreeIPA. Planned responsibilities include identity management, authentication, authorization, Kerberos, LDAP, host enrollment and identity-related DNS integration.
+
+Reference sizing: **2 vCPU / 2 GiB RAM / 20 GiB OS disk + 20 GiB data disk**.
 
 ## db01 — Database
 
-`db01` provides centralized PostgreSQL services, database administration, storage, backup, and recovery.
+**Status: Planned**
 
-```text
-disk 0 — 20 GiB
-└── Operating System
+`db01` is the planned Pardus Server VM for PostgreSQL.
 
-disk 1 — 50 GiB
-└── vg_data
-    └── lv_pg_data
-```
+Reference sizing: **4 vCPU / 8 GiB RAM / 20 GiB OS disk + 50 GiB data disk**.
 
-The PostgreSQL data directory is stored on the dedicated data logical volume. A third dedicated PostgreSQL disk is intentionally not part of the current architecture.
+The PostgreSQL data directory is planned for the second disk. A third dedicated PostgreSQL disk is not part of the current architecture.
 
 ## app01 — Application Platform
 
-`app01` provides the Ubuntu Server and Docker application platform hosting Nginx, Portainer, Teleport CE, Keycloak, OpenBao, NetBox, Squid, Forgejo, Woodpecker CI, Wiki.js, and Project Pulp.
+**Status: Planned**
 
-```text
-disk 0 — 20 GiB
-└── Operating System
+`app01` is the planned Ubuntu Server VM for the Docker application platform.
 
-disk 1 — 50 GiB
-└── Docker / application persistent data
-```
+Planned services include Nginx, Portainer, Teleport CE, Keycloak, OpenBao, NetBox, Squid Gateway, Forgejo, Woodpecker CI, Wiki.js and Project Pulp.
 
-Persistent application data should use the second disk whenever practical.
+These services are **planned**, not current implementation claims.
+
+Reference sizing: **4 vCPU / 10 GiB RAM / 20 GiB OS disk + 50 GiB data disk**.
+
+Persistent application data is planned for the second disk.
 
 ## auto01 — Automation
 
-`auto01` provides Ansible, OpenTofu, configuration management, infrastructure provisioning, repeatable deployments, and maintenance automation.
+**Status: Planned**
 
-Storage baseline: 20 GiB OS disk + 20 GiB data disk.
+`auto01` is the planned RHEL VM for Ansible and OpenTofu.
+
+Automation has **not yet been implemented in the laboratory**. The VM remains a planned architecture component.
+
+Reference sizing: **2 vCPU / 4 GiB RAM / 20 GiB OS disk + 20 GiB data disk**.
 
 ---
 
@@ -117,9 +130,8 @@ Linux-based VMs use a common Proxmox configuration baseline.
 | Machine | `q35` |
 | BIOS | OVMF (UEFI) |
 | EFI Disk | Enabled |
-| Pre-Enroll keys | Disabled |
 | SCSI Controller | VirtIO SCSI single |
-| QEMU Agent | Enabled |
+| QEMU Guest Agent | Enabled |
 | CPU Sockets | 1 |
 | CPU Type | `host` |
 | Network Model | VirtIO |
@@ -139,38 +151,34 @@ VM
 └── SCSI 1 — Role-specific Data
 ```
 
-## Disk 0 — Operating System
+## Disk 1 — Operating System
 
 Default size: **20 GiB**.
 
-Logical structure:
-
 ```text
-Disk 0
+Disk 1
 ├── EFI System Partition
 ├── /boot
 └── vg_os
     └── lv_root
 ```
 
-`/var`, `/home`, and `/tmp` are intentionally kept outside the root filesystem according to the storage architecture.
-
-## Disk 1 — Role-specific Data
+## Disk 2 — System / Application Data
 
 Default baseline: **20 GiB**.
 
 ```text
-Disk 1
+Disk 2
 └── vg_data
     ├── lv_var
     ├── lv_home
     ├── lv_tmp
-    └── Role-Specific Data
+    └── Role-specific Data
 ```
 
-Database and Docker workloads use larger second disks.
+`/var`, `/home` and `/tmp` are intentionally placed on **Disk 2**. Workloads such as PostgreSQL and Docker therefore keep their persistent data outside the OS disk.
 
-### Current sizing
+### Reference sizing
 
 | Workload | OS Disk | Data Disk |
 |---|---:|---:|
@@ -184,14 +192,12 @@ Database and Docker workloads use larger second disks.
 
 # CPU Standard
 
-Linux VMs use one socket and CPU type `host`. CPU cores are workload-dependent.
-
-Suggested baseline:
+Linux VMs use one socket and CPU type `host`. Reference allocations are:
 
 | VM | vCPU |
 |---|---:|
 | `ipa01` | 2 |
-| `db01` | 2–4 |
+| `db01` | 4 |
 | `app01` | 4 |
 | `auto01` | 2 |
 
@@ -201,18 +207,16 @@ Suggested baseline:
 
 # Memory Standard
 
-Memory allocation is workload-dependent.
-
-Suggested baseline:
+Reference allocations are:
 
 | VM | RAM |
 |---|---:|
-| `ipa01` | 4 GiB |
-| `db01` | 4–8 GiB |
-| `app01` | 8–12 GiB |
+| `ipa01` | 2 GiB |
+| `db01` | 8 GiB |
+| `app01` | 10 GiB |
 | `auto01` | 4 GiB |
 
-`app01` receives the highest allocation because it hosts multiple Docker services. `db01` can receive additional memory as PostgreSQL workloads increase.
+`app01` receives a larger allocation because multiple application services are planned for the VM. `db01` can be increased after workload testing.
 
 ---
 
@@ -220,52 +224,54 @@ Suggested baseline:
 
 Linux VMs use VirtIO networking on `vmbr0`.
 
-Network placement is determined by the network architecture. VM isolation is supplemented by network segmentation and firewall policies enforced through `fw01`.
+Network placement follows the network architecture:
 
-The Proxmox firewall may be enabled when a specific requirement exists.
+| VLAN | Purpose |
+|---:|---|
+| 10 | Management |
+| 20 | Identity / Core |
+| 30 | Database |
+| 40 | Application |
+
+VM isolation is supplemented by VLAN segmentation and firewall policies through `fw01`.
 
 ---
 
 # Application Isolation
 
-Multiple applications may run on `app01`, but they should not automatically have unrestricted communication with each other. Docker networks provide application-level segmentation.
+Multiple applications are planned for `app01`, but they should not automatically have unrestricted communication with each other. Docker networks should provide application-level segmentation.
 
 Services should communicate only with the systems and ports required for their operation.
-
-This supports least privilege, Zero Trust principles, reduced lateral movement, and clear service boundaries.
 
 ---
 
 # Resource Allocation Principles
 
-Because the architecture runs on a single physical host:
+Because the architecture targets a single physical host:
 
 1. Start with conservative resource allocations.
-2. Monitor actual utilization.
-3. Increase resources based on observed workload.
-4. Avoid unnecessary CPU and memory reservations.
-5. Give additional resources to database and application workloads when required.
+2. Keep host headroom available.
+3. Increase resources based on observed utilization.
+4. Avoid unnecessary reservations.
+5. Give database and application workloads additional resources when justified.
 6. Keep infrastructure services lightweight.
-7. Prefer workload-based sizing over arbitrary allocation.
-
-Resource allocation is a tunable configuration rather than a fixed architectural requirement.
+7. Treat resource allocation as a tunable reference, not a fixed production specification.
 
 ---
 
 # Security Considerations
 
-VM separation is one layer of the overall security architecture.
-Additional controls include network segmentation, firewall policies, least privilege, identity-based access, service isolation, restricted administrative access, secret management, encrypted communication, and minimal exposed services.
+VM separation is one layer of the security architecture. Additional planned controls include network segmentation, firewall policies, least privilege, identity-based access, restricted administrative access, secret management, encrypted communication and minimal exposed services.
 
-Sensitive credentials should not be stored directly in Git repositories, Docker Compose files, VM configuration files, or infrastructure-as-code repositories.
+Sensitive credentials must not be stored directly in Git repositories, Docker Compose files, VM configuration files or infrastructure-as-code repositories.
 
 ---
 
 # Backup and Recovery
 
-VM snapshots are useful for testing, maintenance, short-term rollback, and configuration changes, but they are not a complete backup strategy.
+VM snapshots are useful for testing, maintenance, short-term rollback and configuration changes, but they are not a complete backup strategy.
 
-Critical persistent data includes PostgreSQL databases, application data, identity data, Git repositories, configuration, infrastructure definitions, and secrets.
+Critical persistent data will include PostgreSQL databases, application data, identity data, Git repositories, configuration, infrastructure definitions and secrets once those workloads are implemented.
 
 Application-aware backups should be used for critical workloads where appropriate.
 
@@ -293,17 +299,15 @@ Maintain
 Decommission
 ```
 
-The project should progressively automate VM provisioning and configuration using Ansible and OpenTofu to reduce manual configuration and configuration drift.
+Infrastructure provisioning and configuration automation with Ansible and OpenTofu is a **planned future stage**. It is not currently implemented in the laboratory.
 
 ---
 
 # Future Expansion
 
-The current environment is intentionally designed for a single Proxmox host.
+Potential future capabilities include multiple Proxmox nodes, identity replicas, PostgreSQL replication, application replicas, load balancing, centralized monitoring and high availability.
 
-Potential future capabilities include multiple Proxmox nodes, identity replicas, PostgreSQL replication, application replicas, load balancing, centralized monitoring, and high availability.
-
-These capabilities are outside the scope of the current implementation.
+These capabilities are outside the current implementation scope.
 
 ---
 
@@ -318,6 +322,9 @@ SCSI 0
 
 SCSI 1
 └── 20 GiB baseline
+    ├── /var
+    ├── /home
+    ├── /tmp
     └── Role-specific Data
 ```
 
@@ -331,4 +338,4 @@ app01
 20 GiB OS + 50 GiB Application Data
 ```
 
-This approach keeps the infrastructure simple enough to run on modest hardware while maintaining clear separation between operating-system files and persistent workload data.
+This design keeps the infrastructure simple enough for modest hardware while maintaining clear separation between operating-system files and persistent workload data.
