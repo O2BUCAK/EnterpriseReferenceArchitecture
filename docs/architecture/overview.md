@@ -1,169 +1,161 @@
 # Architecture Overview
 
-> A high-level overview of the Enterprise Reference Architecture and how its major infrastructure domains fit together.
+> High-level reference architecture for the Enterprise Reference Architecture (FOSS Home Lab).
 
 ## Purpose
 
-This document provides a high-level view of the architecture implemented by the project.
-The environment is designed as a small-scale enterprise IT reference architecture that demonstrates how networking, security, identity, applications, databases, and infrastructure automation can be integrated into a cohesive platform.
-The architecture is intentionally designed to run on modest hardware while following principles commonly found in larger enterprise environments.
+This document describes the **target architecture** of the project. It is a design document and must not be interpreted as proof that every component shown has been deployed in the laboratory.
+
+The lab is implemented incrementally. Components not yet built are marked **Planned**.
+
+---
+
+## Status Convention
+
+| Status | Meaning |
+|---|---|
+| **Implemented** | Installed, configured, and tested in the lab |
+| **Planned** | Defined by the architecture but not yet implemented |
+| **Future** | Deferred to a later phase |
+| **Documented** | Design decision only; no implementation claim |
+
+> A component is **Implemented** only after actual laboratory validation.
 
 ---
 
 ## Architectural Model
 
-The environment is organized into several logical infrastructure and network domains:
+The target architecture is organized into separate infrastructure and network domains:
 
 ```text
-┌─────────────────────────────────────────────────────────────┐
-│                        Internet / WAN                       │
-└─────────────────────────────┬───────────────────────────────┘
-                              │
-                              ▼
-                     ┌─────────────────┐
-                     │    OPNsense     │
-                     │ Firewall / Edge │
-                     └────────┬────────┘
-                              │
-                    Network Segmentation
-                              │
-        ┌─────────────┬───────┼────────┬─────────────┐
-        │             │       │        │             │
-        ▼             ▼       ▼        ▼             │
-┌──────────────┐ ┌──────────┐ ┌──────────┐ ┌──────────────┐
-│ Management   │ │   Core   │ │ Database │ │ Applications │
-│   VLAN 10    │ │ VLAN 20  │ │ VLAN 30  │ │   VLAN 40    │
-│              │ │          │ │          │ │              │
-│    auto01    │ │  ipa01   │ │  db01    │ │    app01     │
-│ Ansible      │ │ FreeIPA  │ │PostgreSQL│ │    Docker    │
-│ OpenTofu     │ │ Identity │ │          │ │   Services   │
-└──────────────┘ └──────────┘ └──────────┘ └──────────────┘
-                                      ▲              │
-                                      │              │
-                                      └──────────────┘
-                                  Controlled Database Access
+                         Internet / WAN
+                              |
+                              v
+                       +--------------+
+                       |    fw01      |
+                       |   OPNsense   |
+                       +------+-------+
+                              |
+                     Planned segmentation
+                              |
+        +-------------+-------+--------+-------------+
+        |             |                |             |
+        v             v                v             v
+   VLAN 10        VLAN 20          VLAN 30       VLAN 40
+   Management     Identity         Database      Application
+        |             |                |             |
+      auto01        ipa01            db01          app01
+     Planned       Planned          Planned        Planned
+        |             |                |             |
+     Ansible       FreeIPA       PostgreSQL      Docker
+     OpenTofu                                      Planned
 ```
 
-The architecture separates infrastructure responsibilities into distinct network segments rather than operating all services within a single trusted network.
-Each VLAN represents an independent security and trust boundary. Communication between segments is controlled by OPNsense and should be explicitly permitted only when required by the architecture.
-The **Database VLAN (VLAN 30)** is an independent network segment. Application workloads in **VLAN 40** may access database services only through explicitly defined firewall and network policies.
+The diagram represents the **target design**. At the current project stage, only components explicitly listed as Implemented in the repository status should be considered deployed.
 
 ---
 
 ## Core Components
 
-| Component | Role                                        | Network  |
-| --------- | ------------------------------------------- | -------- |
-| `fw01`    | Firewall, routing, and network segmentation | OPNsense |
-| `auto01`  | Infrastructure automation and IaC           | VLAN 10  |
-| `ipa01`   | Identity and core services                  | VLAN 20  |
-| `db01`    | PostgreSQL database services                | VLAN 30  |
-| `app01`   | Containerized application platform          | VLAN 40  |
+| Component | Role | Status |
+|---|---|---|
+| `fw01` | Firewall, routing and segmentation | **Implemented** |
+| `ipa01` | FreeIPA identity services | **Planned** |
+| `db01` | PostgreSQL database services | **Planned** |
+| `app01` | Docker application platform | **Planned** |
+| `auto01` | Ansible and OpenTofu automation | **Planned** |
 
-Each system has a defined responsibility, allowing the architecture to demonstrate separation of concerns and controlled communication between infrastructure domains.
+The VM names and roles are architectural definitions. Their presence in this table does not imply that the VM has already been provisioned.
 
 ---
 
 ## Network Architecture
 
-The network is divided into dedicated VLANs according to infrastructure roles.
+The target network contains four logical segments:
 
-| VLAN    | Purpose       | Primary Workload                         |
-| ------- | ------------- | ---------------------------------------- |
-| VLAN 10 | Management    | Infrastructure management and automation |
-| VLAN 20 | Core Services | Identity and supporting services         |
-| VLAN 30 | Database      | PostgreSQL                               |
-| VLAN 40 | Applications  | Containerized applications               |
+| VLAN | Purpose | Primary Workload | Status |
+|---|---|---|---|
+| VLAN 10 | Management | Infrastructure management / automation | Planned architecture |
+| VLAN 20 | Core / Identity | FreeIPA | Planned |
+| VLAN 30 | Database | PostgreSQL | Planned |
+| VLAN 40 | Applications | Docker workloads | Planned |
 
-OPNsense acts as the network security boundary and controls traffic between these segments.
-The goal is not simply to create VLANs, but to demonstrate **controlled communication between security zones based on workload requirements**.
-Detailed network topology, addressing, VLAN configuration, and firewall policies are documented separately.
+Inter-segment communication is intended to be controlled by OPNsense using explicit, least-privilege firewall policies.
+
+Detailed network design is documented in [`../network/network.md`](../network/network.md).
 
 ---
 
 ## Application Platform
 
-The application layer is hosted on `app01` using Docker.
-The platform is intended to host infrastructure and enterprise-oriented services covering areas such as:
+`app01` is the **planned** application platform. The design targets Docker-based services such as Nginx, Portainer, Teleport CE, Keycloak, OpenBao, NetBox, Squid, Forgejo, Woodpecker CI, Wiki.js, and Project Pulp.
 
-* Reverse proxy and web services
-* Identity and authentication
-* Secrets management
-* Privileged access
-* Infrastructure inventory
-* Source control and CI/CD
-* Documentation and knowledge management
-* Network and infrastructure management
-
-Applications are treated as independent workloads rather than being installed directly into the host operating system wherever practical.
-The application platform is intentionally separated from the database layer. Persistent application data requiring PostgreSQL is stored on `db01`.
+These services are **Planned** unless separately documented as Implemented after laboratory validation.
 
 ---
 
 ## Data Layer
 
-Persistent database services are separated from the application platform.
-`db01` provides PostgreSQL database services on the dedicated **Database VLAN (VLAN 30)**.
-The database layer is an independent architectural and network domain. Application workloads on **VLAN 40** communicate with the database layer only through explicitly permitted network flows.
+`db01` is the **planned** PostgreSQL database layer. Application workloads are designed to access database services through explicitly permitted network flows.
 
-```text
-Application Layer
-VLAN 40
-      │
-      │ Explicitly permitted database access
-      ▼
-Database Layer
-VLAN 30
-```
-
-This separation demonstrates a common enterprise architecture pattern in which application workloads and database services are isolated from one another.
+The database architecture is documented independently from the application platform.
 
 ---
 
 ## Identity and Access
 
-Identity is treated as a central architectural capability rather than an application-specific feature.
-`ipa01` provides the core identity services through FreeIPA. Additional services can integrate with the identity layer for authentication and authorization where appropriate.
-The architecture includes dedicated capabilities for identity management, authentication and authorization, secrets management, privileged access, and service-to-service credentials.
+`ipa01` and the surrounding identity architecture are **Planned** at the current project stage.
 
-This supports the project's **Zero Trust** and **Zero Plaintext** principles.
+The target design uses:
+
+* FreeIPA for infrastructure identity
+* Keycloak for application-oriented SSO
+* OpenBao for secrets management
+* Teleport CE for privileged access
+
+These are architectural targets and are not implementation claims.
 
 ---
 
 ## Automation and Infrastructure as Code
 
-Infrastructure management is separated from application workloads.
-`auto01` provides the automation layer using **Ansible** for configuration and operational automation and **OpenTofu** for infrastructure as code.
-The objective is to make infrastructure changes reproducible, documented, and increasingly automated rather than dependent on manual configuration.
+`auto01`, Ansible, and OpenTofu are **Planned**.
+
+The lab has not yet reached the Automation & IaC implementation phase. The architecture documents the intended future design so that automation can be introduced consistently when that phase is reached.
 
 ---
 
 ## Security Architecture
 
-Security is implemented as a cross-cutting architectural concern.
-The main security principles are:
+Security is a cross-cutting **design principle** throughout the architecture.
 
-* **Zero Trust** — Network location alone does not establish trust.
-* **Zero Plaintext** — Sensitive credentials and secrets should not be stored or transmitted in plaintext where secure alternatives are available.
-* **Microsegmentation** — Infrastructure roles are separated into dedicated network segments and communication is limited to explicitly required flows.
-* **Least Privilege** — Users, services, and infrastructure components receive only the access required for their intended functions.
+The main principles are:
+
+* **Zero Trust**
+* **Zero Plaintext**
+* **Microsegmentation**
+* **Least Privilege**
+* **Defense in Depth**
+* **Secure by Default**
+
+The principles are documented independently from implementation status.
 
 ---
 
 ## Architectural Principles
 
-The project follows these principles throughout the design:
+1. **FOSS-first**
+2. **Security by design**
+3. **Separation of concerns**
+4. **Least privilege**
+5. **Network segmentation**
+6. **Automation first**
+7. **Infrastructure as Code**
+8. **Documentation as code**
+9. **Practicality**
+10. **Reproducibility**
 
-1. **FOSS-first** — Prefer free and open-source software where practical.
-2. **Security by design** — Security requirements are considered during architecture design rather than added later.
-3. **Separation of concerns** — Infrastructure responsibilities are divided by function.
-4. **Least privilege** — Access is limited to what is required.
-5. **Network segmentation** — Infrastructure domains are isolated through VLANs and firewall policies.
-6. **Automation first** — Repetitive infrastructure operations should become automated.
-7. **Infrastructure as Code** — Infrastructure configuration should be reproducible and reviewable.
-8. **Documentation as code** — Architecture and operational knowledge should live alongside the implementation.
-9. **Practicality** — Enterprise concepts should remain achievable on modest hardware.
-10. **Reproducibility** — The environment should be understandable and rebuildable by another engineer.
+These are design principles; their presence in this document does not mean every related capability has already been implemented.
 
 ---
 
@@ -171,15 +163,10 @@ The project follows these principles throughout the design:
 
 | Documentation | Description |
 |---|---|
-| [`../network/network.md`](../network/network.md) | Network topology, VLANs, segmentation, and firewall design |
-| [`../security/security.md`](../security/security.md) | Security architecture, controls, and security principles |
-| [`../vm-design/vm-design.md`](../vm-design/vm-design.md) | Virtual machine design, roles, and system specifications |
-| [`../resource-matrix/vm-resource-matrix.md`](../resource-matrix/vm-resource-matrix.md) | VM resource allocation and hardware resource planning |
-| [`../operations/`](../operations/) | Operational procedures, monitoring, backup, and maintenance |
-| [`../project/story.md`](../project/story.md) | Project background and development context |
-| [`../../ansible/`](../../ansible/) | Ansible automation and configuration management |
-| [`../../docker/`](../../docker/) | Docker application platform and container configurations |
-| [`../../opentofu/`](../../opentofu/) | OpenTofu infrastructure as code |
-| [`../../scripts/`](../../scripts/) | Supporting Bash and PowerShell scripts |
+| [`../network/network.md`](../network/network.md) | Network architecture and segmentation |
+| [`../security/security.md`](../security/security.md) | Security architecture and controls |
+| [`../vm-design/vm-design.md`](../vm-design/vm-design.md) | VM design standards |
+| [`../resource-matrix/vm-resource-matrix.md`](../resource-matrix/vm-resource-matrix.md) | Resource planning |
+| [`../project/story.md`](../project/story.md) | Project background |
 
-> This document describes the architecture at a high level. Implementation-specific decisions, configuration details, and operational procedures should be documented in the corresponding domain documentation.
+> This document describes the **reference design**. Actual implementation status must be taken from the explicit status sections and implementation evidence in the repository.
