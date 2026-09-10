@@ -1,13 +1,27 @@
 # Security Architecture
 
-> A high-level overview of the security architecture, principles, controls, and trust boundaries implemented across the Enterprise Reference Architecture.
+> Security principles and target controls for the Enterprise Reference Architecture.
+
+## Status
+
+**Documented / Planned architecture.**
+
+This document describes the security model and intended controls. It does not claim that all controls or security services are currently implemented in the lab.
+
+## Status Convention
+
+| Status | Meaning |
+|---|---|
+| **Implemented** | Installed, configured, and tested in the lab |
+| **Planned** | Defined in the architecture but not yet implemented |
+| **Future** | Deferred to a later phase |
+| **Documented** | Design decision only |
+
+---
 
 ## Purpose
 
-This document describes the security architecture of the Enterprise Reference Architecture.
-The environment is designed as a small-scale enterprise security reference platform that demonstrates how identity, network security, secrets management, access control, segmentation, and infrastructure automation can work together.
-
-The design follows enterprise security principles while remaining practical enough to operate on modest hardware.
+The security architecture defines how identity, network security, access control, secrets management, segmentation, host security, application security, logging, and future automation should work together.
 
 ---
 
@@ -15,155 +29,115 @@ The design follows enterprise security principles while remaining practical enou
 
 ### Zero Trust
 
-No system, user, or network segment is implicitly trusted. Access should be explicitly authenticated, explicitly authorized, limited to the required scope, logged and auditable, and re-evaluated when appropriate.
+No system, user, or network segment should be implicitly trusted. Access should be authenticated, authorized, limited to the required scope, and auditable.
 
 ### Zero Plaintext
 
-Sensitive credentials and secrets should not be stored directly in source code, configuration files, Docker Compose files, Git repositories, automation playbooks, documentation, or committed environment files.
-Secrets management is handled through dedicated infrastructure such as OpenBao.
+Sensitive credentials and secrets should not be stored directly in source code, configuration files, Docker Compose files, Git repositories, documentation, or committed environment files.
 
 ### Least Privilege
 
-Every account, service, and automation process should receive only the permissions required to perform its function.
+Accounts, services, and automation processes should receive only the permissions required for their function.
 
 ### Defense in Depth
 
-Security controls are distributed across network, firewall, identity, authentication, authorization, secrets management, host security, application security, logging/auditing, and automation layers.
+Security should be distributed across network, firewall, identity, authentication, authorization, secrets, host, application, and logging layers.
 
 ### Secure by Default
 
-Services should be deployed with restrictive defaults. Unnecessary ports, services, accounts, permissions, and network paths should remain disabled.
+Unnecessary ports, services, accounts, permissions, and network paths should remain disabled.
 
 ---
 
-## Security Zones and Trust Boundaries
+## Network Security — Partly Implemented / Target Design
 
-The environment uses network segmentation to establish security boundaries between management, identity, application, database, security/administrative, and external/WAN domains.
+OPNsense is an **Implemented** component of the lab. The broader VLAN segmentation and policy model documented here represents the target architecture and should only be marked implemented after it has been configured and validated in the lab.
 
-Segmentation is enforced primarily through the firewall and network policy. The database network is treated as a **network security segment**, not as an application VLAN.
-
-Traffic between security zones should be explicitly allowed according to service requirements. Default-deny behavior is preferred over broad network access.
+The target model uses default-deny inter-VLAN communication and explicit service-specific rules.
 
 ---
 
-## Firewall and Network Security
+## Identity and Authentication — Planned
 
-OPNsense provides the primary network security boundary and is responsible for inter-VLAN traffic control, WAN connectivity, NAT, routing, firewall policies, network segmentation, administrative access restrictions, VPN functionality where required, and network-level logging.
+The target identity model uses FreeIPA for infrastructure identity and Keycloak for application-oriented authentication and SSO.
 
-Firewall rules should follow a default-deny model wherever practical and be based on source network, destination network, protocol, destination port, and required service function.
-
----
-
-## Identity and Authentication
-
-FreeIPA provides centralized identity and authentication services, including users, groups, host identities, Kerberos, LDAP, centralized access policies, and certificate management.
-
-The architecture intentionally does not depend on Microsoft Active Directory. Local emergency or break-glass accounts may exist where operationally necessary, but their use should be restricted and audited.
+Both are **Planned** unless separately validated as implemented.
 
 ---
 
-## Application Authentication
+## Privileged Access — Planned
 
-Keycloak provides application-oriented identity and authentication capabilities including SSO, OpenID Connect, OAuth 2.0, SAML, identity federation, and centralized authentication policies.
+Teleport CE is a planned controlled administrative access layer.
 
-Applications should avoid implementing independent authentication systems when centralized identity integration is practical.
-
----
-
-## Privileged Access
-
-Teleport is used as a controlled access layer for administrative connectivity.
-Administrative access should be authenticated, authorized, auditable, limited by role and target system, and protected by strong authentication.
-
-Direct exposure of SSH, RDP, database administration interfaces, or other management services to untrusted networks should be avoided.
+Direct exposure of management interfaces to untrusted networks should be avoided.
 
 ---
 
-## Secrets Management
+## Secrets Management — Planned
 
-OpenBao provides centralized secrets management for passwords, API tokens, application credentials, database credentials, certificates, encryption keys, and service credentials.
+OpenBao is planned for centralized secrets management.
 
-Secrets must not be committed to Git repositories.
-Example configuration files should contain placeholders only.
-
----
-
-## Container Security
-
-Application workloads running on Docker should be isolated according to their function.
-Security considerations include minimal container images, non-root containers where supported, restricted capabilities, limited filesystem access, explicit network connectivity, secure secret delivery, regular image updates, and avoidance of unnecessary published ports.
-
-Docker isolation does not replace host or network-level security controls.
+Secrets must never be committed to the public repository, regardless of whether OpenBao has yet been implemented.
 
 ---
 
-## Database Security
+## Container Security — Planned
 
-The PostgreSQL server is located in a dedicated database security segment.
-Database access should be restricted to explicitly authorized application or administrative sources and should not be directly accessible from untrusted networks, general user networks, or the public Internet.
+Docker is a planned application platform. When implemented, container workloads should use minimal images, non-root execution where supported, restricted capabilities, limited filesystem access, explicit networks, secure secret delivery, and controlled published ports.
 
-Application services should use dedicated database accounts rather than unrestricted administrative accounts.
-
----
-
-## Host Security
-
-Each infrastructure host should follow a hardened operating system baseline appropriate to its role.
-Recommended controls include minimal package installation, regular security updates, firewall configuration, secure SSH configuration, strong authentication, restricted administrative access, disabling unnecessary services, centralized logging where practical, and time synchronization.
+Docker isolation does not replace host or network security.
 
 ---
 
-## Infrastructure Automation Security
+## Database Security — Planned
 
-Ansible and OpenTofu automate infrastructure deployment and configuration. Automation introduces privileged access and must therefore be treated as a security-sensitive component.
+PostgreSQL on `db01` is a planned database layer.
 
-Automation credentials should use dedicated service identities, follow least privilege, avoid embedded passwords, retrieve secrets securely, be rotated periodically, and be protected from unauthorized modification.
-
-Automation repositories must never contain production-like credentials or private keys.
+The target architecture places database services in a dedicated network segment and permits access only from explicitly authorized sources.
 
 ---
 
-## Certificate and TLS Security
+## Host Security — Design
 
-Encrypted communication should be preferred whenever supported.
-TLS should be used for web applications, administrative interfaces, APIs, authentication services, and other services carrying sensitive information.
+Each future infrastructure host should follow a hardened baseline appropriate to its role, including security updates, secure administrative access, restricted services, logging, and time synchronization.
 
-Certificates and private keys should be managed securely. Private keys must never be committed to version control.
-Internal services may use an internal certificate authority where appropriate.
+The exact controls will be documented and validated during implementation.
 
 ---
 
-## Logging and Auditing
+## Infrastructure Automation Security — Future / Planned
 
-Security-relevant activity should be logged whenever practical.
-Important events include authentication attempts, failed authentication, privilege escalation, administrative access, firewall events, configuration changes, secrets access, infrastructure changes, and application security events.
+Ansible and OpenTofu are planned but the lab has **not yet reached the Automation & IaC phase**.
 
-Logs should provide enough information for troubleshooting and investigation without unnecessarily exposing sensitive information. Logs themselves should be treated as sensitive infrastructure data.
-
----
-
-## Backup and Recovery Security
-
-Backups are part of the security architecture.
-Backup protection should include access control, encryption where appropriate, restricted administrative access, integrity verification, and regular recovery testing.
-
-A backup that cannot be restored reliably should not be considered a successful backup.
+When implemented, automation credentials must use dedicated identities, least privilege, secure secret retrieval, and version-controlled configuration without embedded credentials.
 
 ---
 
-## Security Monitoring
+## Certificate and TLS Security — Design
 
-The architecture is designed to support future integration of centralized logging, intrusion detection, vulnerability scanning, configuration compliance, security event correlation, endpoint monitoring, and container image scanning.
-
-Security monitoring should evolve alongside the infrastructure rather than being treated as a separate system.
+Encrypted communication should be preferred wherever supported. Certificates and private keys must be protected and must never be committed to version control.
 
 ---
 
-## Security Lifecycle
+## Logging and Auditing — Future / Planned
 
-Security is treated as a continuous process. The environment should periodically review identity and access permissions, firewall rules, exposed services, operating system updates, container images, application dependencies, secrets and credentials, certificates, backup integrity, and administrative accounts.
+Security-relevant events should be logged as the architecture matures, including authentication, privilege changes, firewall events, configuration changes, secrets access, and infrastructure changes.
 
-Changes should be documented and, where practical, implemented through automation.
+Centralized logging and security monitoring are future capabilities unless explicitly validated as implemented.
+
+---
+
+## Backup and Recovery Security — Future / Planned
+
+Backups should use appropriate access control, encryption where required, integrity verification, and regular recovery testing.
+
+A backup strategy is a future operational capability unless implementation evidence exists.
+
+---
+
+## Security Monitoring — Future
+
+Future capabilities may include centralized logging, intrusion detection, vulnerability scanning, configuration compliance, security event correlation, endpoint monitoring, and container image scanning.
 
 ---
 
@@ -184,4 +158,12 @@ The architecture aims to demonstrate:
 * Auditable infrastructure changes
 * Reproducible security configuration
 
-The goal is not to claim that the lab represents a fully production-hardened enterprise environment. It provides a practical reference architecture for understanding and demonstrating modern enterprise security principles using primarily open-source technologies.
+These are architectural objectives. They should not be presented as completed capabilities until they are implemented and validated in the lab.
+
+---
+
+## Summary
+
+The security documentation intentionally separates **security design** from **security implementation**.
+
+The project does not claim a control is implemented merely because the architecture specifies it. Implementation status must be established through actual laboratory deployment and validation.
