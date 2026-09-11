@@ -38,6 +38,7 @@ See [`documentation-standard.md`](documentation-standard.md) for the common oper
 |---|---|---|
 | Operations | [`proxmox/operations.md`](proxmox/operations.md) | **Documented** |
 | Monitoring | [`proxmox/monitoring.md`](proxmox/monitoring.md) | **Documented** |
+| Troubleshooting | [`proxmox/troubleshooting.md`](proxmox/troubleshooting.md) | **Documented** |
 | Backup & Recovery | [`proxmox/backup-recovery.md`](proxmox/backup-recovery.md) | **Documented / Planned** |
 
 ### OPNsense
@@ -46,6 +47,7 @@ See [`documentation-standard.md`](documentation-standard.md) for the common oper
 |---|---|---|
 | Operations | [`opnsense/operations.md`](opnsense/operations.md) | **Documented** |
 | Monitoring | [`opnsense/monitoring.md`](opnsense/monitoring.md) | **Documented** |
+| Troubleshooting | [`opnsense/troubleshooting.md`](opnsense/troubleshooting.md) | **Documented** |
 | Backup & Recovery | [`opnsense/backup-recovery.md`](opnsense/backup-recovery.md) | **Documented / Planned** |
 
 > **Status discipline:** A runbook being documented does not make the underlying capability Implemented or Validated. Current lab implementation remains limited to Proxmox VE and OPNsense.
