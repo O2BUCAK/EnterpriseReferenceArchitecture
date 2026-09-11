@@ -2,14 +2,17 @@
 
 Day 2 documents how the infrastructure is **operated, monitored, maintained, secured, recovered, and improved** after deployment.
 
+Day 2 begins with the operational handover from Day 1. See [`transition.md`](transition.md) for the transition and readiness model.
+
 ## Documentation Standard
 
 See [`documentation-standard.md`](documentation-standard.md) for the common operational structure.
 
-## Planned Documentation
+## Operational Documentation
 
 | Operational Area | Document | Status |
 |---|---|---|
+| Day 1 → Day 2 Transition | `transition.md` | **Documented** |
 | Daily Operations | `daily-operations/checklist.md` | **Planned** |
 | Weekly Operations | `weekly-operations/checklist.md` | **Planned** |
 | Monthly Operations | `monthly-operations/checklist.md` | **Planned** |
@@ -28,3 +31,7 @@ See [`documentation-standard.md`](documentation-standard.md) for the common oper
 | Operational Documentation | `documentation/runbook-standard.md` | **Planned** |
 
 > These entries define the target operational documentation set. They do not claim that the procedures have already been executed in the laboratory.
+
+## Current Operational Scope
+
+The current lab has only Proxmox VE and OPNsense implemented. Therefore, Day 2 operational procedures for other components remain future operational targets until those components are actually deployed.
