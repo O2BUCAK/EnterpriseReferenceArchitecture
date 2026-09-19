@@ -22,7 +22,7 @@ See [`documentation-standard.md`](documentation-standard.md) for the common oper
 | Restore | [`backup/restore-test.md`](backup/restore-test.md) | **Documented / Planned** |
 | Disaster Recovery | [`disaster-recovery/overview.md`](disaster-recovery/overview.md) | **Documented / Planned** |
 | Security Operations | [`security-operations/overview.md`](security-operations/overview.md) | **Documented / Planned** |
-| Identity Operations | `identity-operations/overview.md` | **Planned** |
+| Identity Operations | [`identity-operations/overview.md`](identity-operations/overview.md) | **Planned** |
 | Change Management | [`change-management/process.md`](change-management/process.md) | **Documented** |
 | Incident Management | [`incident-management/process.md`](incident-management/process.md) | **Documented** |
 | Capacity Management | [`capacity-management/overview.md`](capacity-management/overview.md) | **Documented / Planned** |
