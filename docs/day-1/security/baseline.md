@@ -475,6 +475,8 @@ The Day 1 security baseline is complete when:
 
 ## Related Documentation
 
+- [`../../security/host-hardening.md`](../../security/host-hardening.md) — Host hardening baseline
+
 - [`../../architecture/overview.md`](../../architecture/overview.md) — Architecture overview
 - [`../../architecture/network.md`](../../architecture/network.md) — Network architecture
 - [`../../security/security.md`](../../security/security.md) — Security architecture
