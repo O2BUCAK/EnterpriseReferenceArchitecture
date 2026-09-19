@@ -166,6 +166,17 @@ The target architecture is organized around network segmentation, centralized id
 
 **Architecture documentation:** [`docs/`](docs/)
 
+### Architecture & Security References
+
+- [PKI / Certificate Architecture](docs/architecture/pki.md)
+- [DNS Architecture](docs/network/dns.md)
+- [Secrets Management](docs/security/secrets-management.md)
+- [Host Hardening Baseline](docs/security/host-hardening.md)
+- [Docker Deployment Standard](docs/day-1/docker/deployment-standard.md)
+- [Architecture Decision Records](docs/adr/README.md)
+
+> Backup and Monitoring are intentionally outside the current implementation scope. They remain future operational capabilities rather than missing architecture components.
+
 ---
 
 ## Key Technologies
