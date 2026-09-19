@@ -216,7 +216,8 @@ EnterpriseReferenceArchitecture/
 │   ├── day-1/              # Build & Configure
 │   ├── day-2/              # Operate & Maintain
 │   ├── network/
-│   ├── security/
+│   ├── security/              # Security architecture and hardening
+│   ├── adr/                   # Architecture Decision Records
 │   ├── vm-design/
 │   ├── resource-matrix/
 │   └── project/
