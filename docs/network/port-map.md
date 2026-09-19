@@ -131,26 +131,28 @@ The target architecture includes:
 
 All services below are **planned** unless separately validated.
 
+> **Port model:** Container ports and host-published ports are intentionally separated. Multiple containers may listen on the same internal port, but two containers cannot bind the same host IP/port. Internal application services should normally remain unpublished and be reached through Nginx or another explicitly documented ingress path. `*` and `**` indicate deployment-specific bindings that must be validated before implementation.
+
 | Service | Container / Published Port | Protocol | Purpose |
 |---|---:|---|---|
-| Nginx HTTP | 80 | TCP | HTTP |
-| Nginx HTTPS | 443 | TCP | HTTPS / reverse proxy |
-| Portainer | 9443 | TCP | Docker management |
-| Portainer Agent | 9001 | TCP | Docker agent |
-| Teleport Proxy | 443 | TCP | Web / proxy access |
-| Teleport SSH Proxy | 3023 | TCP | SSH proxy |
-| Teleport Reverse Tunnel | 3024 | TCP | Reverse tunnel |
-| Teleport Kubernetes | 3026 | TCP | Kubernetes access, if enabled |
-| Keycloak | 8080 | TCP | Application SSO |
-| Keycloak HTTPS | 8443 | TCP | Secure application SSO |
-| OpenBao | 8200 | TCP | Secrets management API/UI |
-| NetBox | 8000 | TCP | IPAM / DCIM |
-| Forgejo Web | 3000 | TCP | Git web interface |
-| Forgejo SSH | 2222 | TCP | Git over SSH |
-| Woodpecker Server | 8000 | TCP | CI/CD |
-| Wiki.js | 3000 | TCP | Documentation |
-| Squid | 3128 | TCP | HTTP/HTTPS proxy |
-| Project Pulp | 443 | TCP | Repository / artifact services |
+| Nginx HTTP | 80 | 80 | TCP | HTTP |
+| Nginx HTTPS | 443 | 443 | TCP | HTTPS / reverse proxy |
+| Portainer | 9443 | 9443 | TCP | Docker management |
+| Portainer Agent | 9001 | 9001 | TCP | Docker agent |
+| Teleport Proxy | 443 | 443* | TCP | Web / proxy access |
+| Teleport SSH Proxy | 3023 | 3023 | TCP | SSH proxy |
+| Teleport Reverse Tunnel | 3024 | 3024 | TCP | Reverse tunnel |
+| Teleport Kubernetes | 3026 | 3026 | TCP | Kubernetes access, if enabled |
+| Keycloak | 8080 | internal only | TCP | Application SSO |
+| Keycloak HTTPS | 8443 | internal only | TCP | Secure application SSO |
+| OpenBao | 8200 | internal only | TCP | Secrets management API/UI |
+| NetBox | 8000 | internal only | TCP | IPAM / DCIM |
+| Forgejo Web | 3000 | internal only | TCP | Git web interface |
+| Forgejo SSH | 2222 | 2222 | TCP | Git over SSH |
+| Woodpecker Server | 8000 | internal only | TCP | CI/CD |
+| Wiki.js | 3000 | internal only | TCP | Documentation |
+| Squid | 3128 | 3128** | TCP | HTTP/HTTPS proxy |
+| Project Pulp | 443 | internal only | TCP | Repository / artifact services |
 
 > Multiple applications may use the same internal container port. Docker network isolation and published host ports must be documented separately when the application platform is implemented.
 
