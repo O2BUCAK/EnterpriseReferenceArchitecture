@@ -97,6 +97,26 @@ The target architecture places database services in a dedicated network segment 
 
 ---
 
+## Host Hardening — Defined Baseline
+
+The repository maintains a common hardening baseline for infrastructure hosts and appliances.
+
+See [Host Hardening Baseline](host-hardening.md) for:
+
+- Proxmox VE hardening
+- OPNsense management and firewall hardening
+- Linux host hardening
+- SSH and privileged-access controls
+- Filesystem and service hardening
+- Docker host and container hardening
+- FreeIPA and PostgreSQL hardening
+- Automation host hardening
+- Network exposure controls
+- Public repository security
+- Positive and negative validation tests
+
+The baseline is **Documented / Planned**. Controls must not be marked Implemented or Validated until they have been applied and evidenced in the laboratory.
+
 ## Host Security — Design
 
 Each future infrastructure host should follow a hardened baseline appropriate to its role, including security updates, secure administrative access, restricted services, logging, and time synchronization.
