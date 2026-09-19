@@ -131,7 +131,7 @@ The target architecture includes:
 
 All services below are **planned** unless separately validated.
 
-> **Port model:** Container ports and host-published ports are intentionally separated. Multiple containers may listen on the same internal port, but two containers cannot bind the same host IP/port. Internal application services should normally remain unpublished and be reached through Nginx or another explicitly documented ingress path. `*` and `**` indicate deployment-specific bindings that must be validated before implementation.
+> **Port model:** Container ports and host-published ports are intentionally separated. Multiple containers may listen on the same internal port, but two containers cannot bind the same host IP/port. Internal application services should normally remain unpublished and be reached through Nginx or another explicitly documented ingress path. `**` indicates a deployment-specific binding that must be validated before implementation.
 
 | Service | Container / Published Port | Protocol | Purpose |
 |---|---:|---|---|
@@ -139,7 +139,7 @@ All services below are **planned** unless separately validated.
 | Nginx HTTPS | 443 | 443 | TCP | HTTPS / reverse proxy |
 | Portainer | 9443 | 9443 | TCP | Docker management |
 | Portainer Agent | 9001 | 9001 | TCP | Docker agent |
-| Teleport Proxy | 443 | 443* | TCP | Web / proxy access |
+| Teleport Proxy | 3080 | internal only | TCP | Web / proxy access |
 | Teleport SSH Proxy | 3023 | 3023 | TCP | SSH proxy |
 | Teleport Reverse Tunnel | 3024 | 3024 | TCP | Reverse tunnel |
 | Teleport Kubernetes | 3026 | 3026 | TCP | Kubernetes access, if enabled |
