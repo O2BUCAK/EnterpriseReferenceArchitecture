@@ -114,6 +114,64 @@ The access model, authentication method, and auditing capabilities will be valid
 
 ---
 
+## Administrative Account Standard — Planned
+
+Applications and infrastructure products must not use their initial/default administrative account for routine administration when a separate administrative identity can be created.
+
+### Standard
+
+For each product:
+
+1. Complete the initial/bootstrap setup using the vendor-provided local administrative account.
+2. Create a dedicated, product-specific administrative account.
+3. Verify that the new account has the required administrative permissions.
+4. Use the dedicated account for routine administration.
+5. Disable the bootstrap/default account where technically supported.
+6. Where disabling is not supported, retain the bootstrap account only as a controlled break-glass account.
+7. Protect break-glass credentials separately and audit their use.
+8. Use MFA where the product supports it.
+9. Do not reuse the same administrative username or password across products.
+
+Examples:
+
+| Product | Dedicated administrative identity |
+|---|---|
+| Proxmox VE | `pve-admin` |
+| FreeIPA | `ipa-admin` |
+| OPNsense | `fw-admin` |
+| Keycloak | `kc-admin` |
+| OpenBao | `bao-admin` |
+| NetBox | `netbox-admin` |
+| Portainer | `portainer-admin` |
+| Teleport CE | `teleport-admin` |
+| Forgejo | `forgejo-admin` |
+| Wiki.js | `wikijs-admin` |
+| PostgreSQL | `pg-admin` |
+
+The exact username may be adapted to the product's identity model, but generic names such as `admin`, `administrator`, or `root` should not be used as the routine administrative identity.
+
+### Bootstrap and Break-Glass Separation
+
+The initial account exists to bootstrap the product. It is not the normal operating identity.
+
+```text
+Initial / Bootstrap Account
+          |
+          v
+Create Dedicated Admin
+          |
+          v
+Verify Access
+          |
+          +----> Disable Bootstrap Account
+          |
+          +----> OR retain as Break-Glass
+```
+
+This standard applies to both web applications and infrastructure platforms, subject to product-specific technical limitations.
+
+---
+
 ## Service Identities — Planned
 
 Applications and automation should use dedicated service identities rather than personal accounts.
