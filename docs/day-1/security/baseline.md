@@ -298,7 +298,35 @@ The lab does not need to artificially reproduce every enterprise organizational 
 
 ---
 
-## 15. Logging and Audit
+## 15. Administrative Account Standard
+
+Every product must transition away from its initial/default administrative account before routine operation.
+
+Day 1 requirements:
+
+- Create a product-specific administrative account.
+- Verify the new account can perform the required administrative functions.
+- Stop using the bootstrap account for routine administration.
+- Disable the bootstrap account where supported.
+- Otherwise retain it as a protected break-glass account.
+- Record any product-specific limitation.
+- Do not reuse the same administrative credentials across products.
+
+Example naming pattern:
+
+```text
+Proxmox    → pve-admin
+FreeIPA    → ipa-admin
+OPNsense   → fw-admin
+Keycloak   → kc-admin
+PostgreSQL → pg-admin
+```
+
+The exact name is product-specific; the principle is separation from the initial/default administrative identity.
+
+---
+
+## 23. Logging and Audit
 
 Security-relevant events should be recorded.
 
