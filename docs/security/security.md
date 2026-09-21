@@ -65,6 +65,25 @@ Both are **Planned** unless separately validated as implemented.
 
 ---
 
+## Administrative Account Standard — Planned
+
+Routine administration must use a dedicated, product-specific administrative identity rather than the initial/default administrative account.
+
+Requirements:
+
+- Do not use default `admin`, `administrator`, or equivalent accounts for routine administration.
+- Create a separate administrative identity for each product where technically possible.
+- Do not reuse administrative credentials across products.
+- Disable bootstrap accounts where supported.
+- If disabling is not supported, retain the account only for controlled break-glass recovery.
+- Protect and audit break-glass credentials.
+- Enable MFA where supported.
+- Prefer centralized identity integration when the product supports it.
+
+This is an architectural control. Product-specific implementation and validation must be documented in the corresponding Day 1 or Day 2 documentation.
+
+---
+
 ## Privileged Access — Planned
 
 Teleport CE is a planned controlled administrative access layer.
