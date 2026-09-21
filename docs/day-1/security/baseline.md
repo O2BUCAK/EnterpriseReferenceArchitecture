@@ -478,7 +478,7 @@ The Day 1 security baseline is complete when:
 - [`../../security/host-hardening.md`](../../security/host-hardening.md) — Host hardening baseline
 
 - [`../../architecture/overview.md`](../../architecture/overview.md) — Architecture overview
-- [`../../architecture/network.md`](../../architecture/network.md) — Network architecture
+- [`../../network/network.md`](../../architecture/network.md) — Network architecture
 - [`../../security/security.md`](../../security/security.md) — Security architecture
 - [`../opnsense/configuration.md`](../opnsense/configuration.md) — OPNsense configuration
 - [`../network/segmentation.md`](../network/segmentation.md) — Network segmentation
