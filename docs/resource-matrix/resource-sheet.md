@@ -80,6 +80,18 @@ Network / Storage / Identity Dependencies
 | Architecture | x86-64 / AMD64 | **Implemented** |
 | Hypervisor | Proxmox VE | **Implemented** |
 
+### Database Services
+
+`db01` hosts the centralized stateful services:
+
+```text
+db01
+├── PostgreSQL
+└── Redis
+```
+
+Redis is provided for applications that explicitly require cache/background-task functionality.
+
 ### Reference Capacity
 
 ```text
@@ -110,7 +122,7 @@ Storage   512 GB NVMe
 |---|---|---|---:|---:|---:|---:|---:|---:|---|
 | `fw01` | Firewall / Gateway | OPNsense | 2 | 4 GB | 40 GB | — | 40 GB | — | **Implemented** |
 | `ipa01` | Identity / DNS | Fedora Server | 2 | 2 GB | 20 GB | 20 GB | 40 GB | 20 | **Planned** |
-| `db01` | PostgreSQL | Pardus Server | 4 | 8 GB | 20 GB | 50 GB | 70 GB | 30 | **Planned** |
+| `db01` | PostgreSQL + Redis | Pardus Server | 4 | 8 GB | 20 GB | 50 GB | 70 GB | 30 | **Planned** |
 | `app01` | Docker Application Platform | Ubuntu Server | 4 | 10 GB | 20 GB | 50 GB | 70 GB | 40 | **Planned** |
 | `auto01` | Automation | RHEL | 2 | 4 GB | 20 GB | 20 GB | 40 GB | 10 | **Planned** |
 | **TOTAL** | | | **14** | **28 GB** | **120 GB** | **140 GB** | **260 GB** | | **Reference** |
