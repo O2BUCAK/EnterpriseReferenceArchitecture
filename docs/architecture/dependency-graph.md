@@ -45,7 +45,7 @@ flowchart TD
     FW["fw01<br/>OPNsense<br/>Firewall / Routing<br/>Implemented"]
 
     IPA["ipa01<br/>FreeIPA<br/>Identity / DNS / Kerberos<br/>Planned"]
-    DB["db01<br/>PostgreSQL<br/>Database<br/>Planned"]
+    DB["db01<br/>PostgreSQL + Redis<br/>Database / Cache<br/>Planned"]
     APP["app01<br/>Docker Platform<br/>Planned"]
     AUTO["auto01<br/>Ansible + OpenTofu<br/>Planned"]
 
@@ -86,30 +86,30 @@ flowchart TD
     APP --> SQUID
     APP --> PULP
 
-    KC --> DB
-    KC --> IPA
+    KC -->|persistent data| DB
+    KC -.->|identity integration| IPA
 
-    NETBOX --> DB
-    FORGE --> DB
-    WIKI --> DB
+    NETBOX -->|PostgreSQL| DB
+    NETBOX -->|Redis| DB
+    FORGE -.->|deployment-dependent DB| DB
+    WIKI -->|PostgreSQL| DB
 
-    WOOD --> FORGE
-    WOOD --> AUTO
+    WOOD -.->|source / webhook integration| FORGE
+    WOOD -.->|deployment automation| AUTO
 
-    NGINX --> KC
-    NGINX --> NETBOX
-    NGINX --> FORGE
-    NGINX --> WIKI
-    NGINX --> PULP
+    NGINX -.->|reverse proxy / upstream| KC
+    NGINX -.->|reverse proxy / upstream| NETBOX
+    NGINX -.->|reverse proxy / upstream| FORGE
+    NGINX -.->|reverse proxy / upstream| WIKI
+    NGINX -.->|reverse proxy / upstream| PULP
 
-    TPORT --> IPA
-    TPORT --> FW
-    TPORT --> DB
-    TPORT --> APP
-    TPORT --> AUTO
+    TPORT -.->|conditional identity integration| IPA
+    TPORT -.->|privileged access| FW
+    TPORT -.->|privileged access| DB
+    TPORT -.->|privileged access| APP
+    TPORT -.->|privileged access| AUTO
 
-    BAO --> IPA
-    BAO --> DB
+    BAO -.->|identity integration| IPA
 
     AUTO --> PVE
     AUTO --> FW
@@ -266,37 +266,65 @@ The target identity model allows Teleport to integrate with the planned identity
 
 ---
 
-## 6. Database Dependency Model
+## 6. Database and Cache Dependency Model
 
-PostgreSQL is the shared stateful dependency for selected applications.
+`db01` is the shared stateful platform for PostgreSQL and Redis.
 
 ```mermaid
 flowchart LR
     DB["db01<br/>PostgreSQL"]
+    REDIS["db01<br/>Redis"]
 
     KC["Keycloak"]
     NB["NetBox"]
     FG["Forgejo"]
     WK["Wiki.js"]
 
-    KC -->|DB| DB
-    NB -->|DB| DB
-    FG -->|DB| DB
-    WK -->|DB| DB
+    KC -->|PostgreSQL| DB
+    NB -->|PostgreSQL| DB
+    NB -->|Redis| REDIS
+    FG -.->|deployment-dependent| DB
+    WK -->|PostgreSQL| DB
 ```
 
-The current architecture identifies the following planned database consumers:
+### PostgreSQL
 
-| Application | PostgreSQL Dependency | Status |
+| Application | PostgreSQL | Relationship |
 |---|---|---|
-| Keycloak | Yes | Planned |
-| NetBox | Yes | Planned |
-| Forgejo | Yes | Planned |
-| Wiki.js | Yes | Planned |
+| Keycloak | Yes | Runtime / persistent data |
+| NetBox | Yes | Runtime / persistent data |
+| Wiki.js | Yes | Runtime / persistent data in selected deployment |
+| Forgejo | Conditional | Deployment-dependent |
 
-Other applications may require PostgreSQL depending on their final deployment model and selected versions.
+### Redis
 
-> Database access should remain application-specific and use dedicated least-privileged database identities.
+Redis is deployed centrally on `db01` for applications that explicitly require it.
+
+| Application | Redis | Relationship |
+|---|---|---|
+| NetBox | Yes | Required in the selected architecture |
+| Keycloak | No | Uses Keycloak's supported cache mechanism |
+| OpenBao | No | Integrated Raft storage |
+| Teleport CE | No | No default Redis dependency |
+| Squid | No | External cache/database not required |
+
+> **Design rule:** A central Redis service does not become a dependency of every application. Only an explicit application requirement creates a runtime dependency.
+
+### OpenBao Storage
+
+OpenBao does **not** depend on PostgreSQL or Redis in the selected architecture.
+
+```text
+OpenBao
+   ↓
+Integrated Raft Storage
+```
+
+This keeps OpenBao independently operable from the shared database/cache layer.
+
+### Teleport Storage
+
+Teleport's storage model remains deployment-specific. The single-node reference deployment should use its supported embedded storage model; an HA design must be validated against the selected Teleport version and storage configuration.
 
 ---
 
@@ -558,25 +586,37 @@ Because multiple services are intentionally consolidated on `app01`, it is a sig
 
 ---
 
-## 15. Dependency Matrix
+## 15. Application Dependency Matrix
 
-| Source | Dependency | Relationship | Status |
-|---|---|---|---|
-| All VMs | Proxmox VE | Virtualization | Implemented |
-| All inter-zone traffic | fw01 | Network enforcement | Implemented / target policy |
-| Linux identity clients | FreeIPA | Authentication / identity | Planned |
-| Keycloak | FreeIPA | External identity source | Planned |
-| Keycloak | PostgreSQL | Persistent data | Planned |
-| NetBox | PostgreSQL | Persistent data | Planned |
-| Forgejo | PostgreSQL | Persistent data | Planned |
-| Wiki.js | PostgreSQL | Persistent data | Planned |
-| Applications | Nginx | HTTPS ingress | Planned |
-| Applications | OpenBao | Secret retrieval | Planned |
-| Administrator | Teleport | Privileged access | Planned |
-| Woodpecker CI | Forgejo | Source / webhook integration | Planned |
-| Woodpecker CI | auto01 | Future deployment automation | Planned |
-| Squid | fw01 | Controlled egress | Planned |
-| auto01 | Infrastructure | Configuration / provisioning | Planned |
+This matrix separates **runtime dependencies** from integrations, ingress relationships and operational access.
+
+| Source | Dependency | Type | Required | Status |
+|---|---|---|---|---|
+| Keycloak | PostgreSQL | Runtime / persistent data | Yes | Planned |
+| Keycloak | FreeIPA | Identity integration | Conditional | Planned |
+| Keycloak | Redis | Runtime dependency | No | Not selected |
+| NetBox | PostgreSQL | Runtime / persistent data | Yes | Planned |
+| NetBox | Redis | Runtime / cache / background tasks | Yes | Planned |
+| Wiki.js | PostgreSQL | Runtime / persistent data | Yes | Planned |
+| Forgejo | PostgreSQL | Deployment-dependent | Conditional | Planned |
+| Woodpecker CI | Forgejo | Source / webhook integration | Conditional | Planned |
+| Woodpecker CI | auto01 | Deployment automation | Conditional | Planned |
+| Nginx | Backend applications | Reverse-proxy integration | Conditional | Planned |
+| Teleport CE | FreeIPA | Identity integration | Conditional | Planned |
+| Teleport CE | External DB | Storage dependency | No | Not selected |
+| OpenBao | Integrated Raft | Internal storage | Yes | Planned |
+| OpenBao | PostgreSQL | External storage | No | Not selected |
+| OpenBao | Redis | External cache/storage | No | Not selected |
+| Squid | External DB | Logging/reporting | No | Not selected |
+
+### Application dependency rules
+
+1. Runtime dependency means the application requires it for normal operation.
+2. Integration dependency does not necessarily prevent the application from starting.
+3. Reverse-proxy relationships are not application runtime dependencies.
+4. Privileged-access relationships are operational access paths, not storage dependencies.
+5. Optional HA/storage components must not be represented as mandatory dependencies.
+6. Shared PostgreSQL and Redis are dependencies only for applications with explicit requirements.
 
 ---
 
