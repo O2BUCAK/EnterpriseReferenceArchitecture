@@ -39,7 +39,7 @@ The design follows:
 |---|---:|---|---|
 | `MGMT_NET` | 10 | `10.10.10.0/24` | Management and automation |
 | `IDENTITY_NET` | 20 | `10.10.20.0/24` | FreeIPA |
-| `DB_NET` | 30 | `10.10.30.0/24` | PostgreSQL |
+| `DB_NET` | 30 | `10.10.30.0/24` | PostgreSQL + Redis |
 | `APP_NET` | 40 | `10.10.40.0/24` | Docker/application platform |
 | `WAN` | — | Upstream | Internet / external network |
 
@@ -119,6 +119,7 @@ Use aliases instead of repeatedly entering individual addresses and ports.
 | `FREEIPA_LDAP` | 389 TCP, 636 TCP | LDAP / LDAPS |
 | `FREEIPA_ADMIN` | 749 TCP | Kerberos administration |
 | `POSTGRESQL` | 5432 TCP | PostgreSQL |
+| `REDIS` | 6379 TCP | Redis |
 | `WEB` | 80, 443 TCP | HTTP / HTTPS |
 | `APP_ADMIN` | 9443 TCP | Portainer |
 | `TELEPORT` | 3023, 3024, 3026 TCP | Teleport |
@@ -242,6 +243,7 @@ The database zone is intentionally restrictive.
 | Rule ID | Source | Destination | Service | Action | Log | Reason |
 |---|---|---|---|---|---|---|
 | DB-001 | `APP01` | `DB01` | TCP 5432 | PASS | Yes | Application database access |
+| DB-003 | `APP01` | `DB01` | TCP 6379 | PASS when required | Yes | Application Redis access |
 
 ### Management database access
 
@@ -280,6 +282,7 @@ The database zone is intentionally restrictive.
 | Rule ID | Source | Destination | Service | Action |
 |---|---|---|---|---|
 | APP-010 | `APP01` | `DB01` | TCP 5432 | PASS |
+| APP-011 | `APP01` | `DB01` | TCP 6379 | PASS when required |
 
 ### Application → Identity
 
@@ -613,7 +616,8 @@ Before marking the policy validated, confirm:
 - [ ] PostgreSQL 5432 is not exposed to WAN.
 - [ ] FreeIPA services are not exposed to WAN.
 - [ ] Inter-VLAN traffic is denied by default.
-- [ ] Application → Database is limited to TCP 5432.
+- [ ] Application → Database is limited to documented PostgreSQL/Redis ports.
+- [ ] Redis 6379 is allowed only for applications that explicitly require it.
 - [ ] Application → Identity is limited to actual application requirements.
 - [ ] Management access is restricted to the management zone.
 - [ ] Public services, when required, terminate at the intended ingress point.
