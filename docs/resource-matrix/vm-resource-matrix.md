@@ -88,7 +88,7 @@ Gateway convention:
 |---:|---|---|---|---:|---|---:|---:|---:|---:|---:|---|
 | 100 | `fw01` | Firewall / Gateway | OPNsense | — | `10.10.x.1` | 2 | 4 GB | 40 GB | — | 40 GB | **Implemented** |
 | 101 | `ipa01` | Identity / DNS | Fedora Server | 20 | `10.10.20.10` | 2 | 2 GB | 20 GB | 20 GB | 40 GB | **Planned** |
-| 102 | `db01` | PostgreSQL Database | Pardus Server | 30 | `10.10.30.10` | 4 | 8 GB | 20 GB | 50 GB | 70 GB | **Planned** |
+| 102 | `db01` | PostgreSQL + Redis Database / Cache | Pardus Server | 30 | `10.10.30.10` | 4 | 8 GB | 20 GB | 50 GB | 70 GB | **Planned** |
 | 103 | `app01` | Docker Application Platform | Ubuntu Server | 40 | `10.10.40.10` | 4 | 10 GB | 20 GB | 50 GB | 70 GB | **Planned** |
 | 104 | `auto01` | Automation | RHEL | 10 | `10.10.10.20` | 2 | 4 GB | 20 GB | 20 GB | 40 GB | **Planned** |
 | **TOTAL** | | | | | | **14** | **28 GB** | **120 GB** | **140 GB** | **260 GB** | **Reference** |
