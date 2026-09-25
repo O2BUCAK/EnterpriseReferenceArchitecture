@@ -39,7 +39,7 @@ The target architecture uses four primary network segments:
 |---:|---|---|---|
 | 10 | Management | `10.10.10.0/24` | Proxmox, OPNsense, automation |
 | 20 | Identity | `10.10.20.0/24` | FreeIPA |
-| 30 | Database | `10.10.30.0/24` | PostgreSQL |
+| 30 | Database | `10.10.30.0/24` | PostgreSQL + Redis |
 | 40 | Application | `10.10.40.0/24` | Docker and application services |
 
 These networks are part of the target architecture and remain planned until separately implemented and validated.
@@ -95,6 +95,7 @@ PostgreSQL is the planned database platform on VLAN 30.
 | Service | Port | Protocol | Purpose |
 |---|---:|---|---|
 | PostgreSQL | 5432 | TCP | Application database access |
+| Redis | 6379 | TCP | Application cache / background-task access |
 | SSH | 22 | TCP | Restricted administration |
 
 ### Expected access
@@ -207,6 +208,7 @@ Applications requiring PostgreSQL should use:
 | Source | Destination | Port | Protocol |
 |---|---|---:|---|
 | `app01` | `db01` | 5432 | TCP |
+| `app01` | `db01` | 6379 | TCP |
 
 No application should receive unrestricted access to PostgreSQL.
 
@@ -336,6 +338,7 @@ The exact firewall rules must be derived from the services actually deployed.
 | Port | Service |
 |---:|---|
 | 5432 | PostgreSQL |
+| 6379 | Redis |
 
 ### Tier 4 — Application
 
