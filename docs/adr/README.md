@@ -2,6 +2,8 @@
 
 Architecture Decision Records capture durable decisions that shape the reference architecture.
 
+## ADRs
+
 | ADR | Decision |
 |---|---|
 | [0001](0001-foss-first.md) | FOSS-first technology selection |
@@ -13,4 +15,21 @@ Architecture Decision Records capture durable decisions that shape the reference
 | [0007](0007-centralized-postgresql.md) | Centralized PostgreSQL |
 | [0008](0008-single-app-host.md) | Single application host for the current lab |
 
+## Decision Methodology
+
+The project uses a common method for material architecture decisions:
+
+[Architecture Decision & Trade-off Methodology](../architecture/architecture-decisions.md)
+
+The methodology covers:
+
+- problem and constraints;
+- candidate options;
+- evaluation criteria;
+- trade-offs;
+- consequences;
+- validation and review triggers.
+
 New decisions that materially change architecture should be added here rather than silently changing existing design documents.
+
+A technology should not be introduced merely because it is commonly used in system-design examples. The workload, constraints, evidence, and operational cost must justify the decision.
