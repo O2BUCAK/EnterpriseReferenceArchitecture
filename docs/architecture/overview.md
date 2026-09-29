@@ -8,8 +8,6 @@ This document describes the **target architecture** of the project. It is a desi
 
 The lab is implemented incrementally. Components not yet built are marked **Planned**.
 
----
-
 ## Status Convention
 
 | Status | Meaning |
@@ -20,8 +18,6 @@ The lab is implemented incrementally. Components not yet built are marked **Plan
 | **Documented** | Design decision only; no implementation claim |
 
 > A component is **Implemented** only after actual laboratory validation.
-
----
 
 ## Architectural Model
 
@@ -53,7 +49,23 @@ The target architecture is organized into separate infrastructure and network do
 
 The diagram represents the **target design**. At the current project stage, only components explicitly listed as Implemented in the repository status should be considered deployed.
 
----
+## System Design Methodology
+
+The architecture uses three complementary practices inspired by system-design methodology:
+
+1. **Architecture decisions and trade-offs** — material choices are documented with constraints, alternatives, consequences, and validation criteria.
+2. **Cache architecture** — caching is treated as an explicit workload decision rather than an automatic platform dependency.
+3. **Bottleneck analysis** — performance investigations are evidence-driven and correlated with actual workload impact.
+
+Queue-based asynchronous processing is **not currently selected as a mandatory platform capability**. See the [Asynchronous Architecture & Queue Decision Guide](async-architecture.md) for the criteria that would justify introducing it.
+
+## Availability and Failure Domain Scope
+
+The current reference architecture intentionally does **not** target hardware-level high availability or multi-host failure-domain design.
+
+The single-host constraint is documented in [ADR 0008](../adr/0008-single-app-host.md).
+
+This does not prevent documenting service dependencies and failure propagation; it means the architecture does not introduce additional hardware solely to provide host-level redundancy.
 
 ## Core Components
 
@@ -61,13 +73,11 @@ The diagram represents the **target design**. At the current project stage, only
 |---|---|---|
 | `fw01` | Firewall, routing and segmentation | **Implemented** |
 | `ipa01` | FreeIPA identity services | **Planned** |
-| `db01` | PostgreSQL database services | **Planned** |
+| `db01` | PostgreSQL and Redis services | **Planned** |
 | `app01` | Docker application platform | **Planned** |
 | `auto01` | Ansible and OpenTofu automation | **Planned** |
 
 The VM names and roles are architectural definitions. Their presence in this table does not imply that the VM has already been provisioned.
-
----
 
 ## Network Architecture
 
@@ -77,14 +87,12 @@ The target network contains four logical segments:
 |---|---|---|---|
 | VLAN 10 | Management | Infrastructure management / automation | Planned architecture |
 | VLAN 20 | Core / Identity | FreeIPA | Planned |
-| VLAN 30 | Database | PostgreSQL | Planned |
+| VLAN 30 | Database | PostgreSQL / Redis | Planned |
 | VLAN 40 | Applications | Docker workloads | Planned |
 
 Inter-segment communication is intended to be controlled by OPNsense using explicit, least-privilege firewall policies.
 
 Detailed network design is documented in [`../network/network.md`](../network/network.md).
-
----
 
 ## Application Platform
 
@@ -92,15 +100,11 @@ Detailed network design is documented in [`../network/network.md`](../network/ne
 
 These services are **Planned** unless separately documented as Implemented after laboratory validation.
 
----
-
 ## Data Layer
 
-`db01` is the **planned** PostgreSQL database layer. Application workloads are designed to access database services through explicitly permitted network flows.
+`db01` is the **planned** PostgreSQL and Redis data/cache layer. Application workloads are designed to access database and cache services through explicitly permitted network flows.
 
-The database architecture is documented independently from the application platform.
-
----
+The database and cache architecture are documented independently from the application platform.
 
 ## Identity and Access
 
@@ -115,15 +119,11 @@ The target design uses:
 
 These are architectural targets and are not implementation claims.
 
----
-
 ## Automation and Infrastructure as Code
 
 `auto01`, Ansible, and OpenTofu are **Planned**.
 
 The lab has not yet reached the Automation & IaC implementation phase. The architecture documents the intended future design so that automation can be introduced consistently when that phase is reached.
-
----
 
 ## Security Architecture
 
@@ -140,8 +140,6 @@ The main principles are:
 
 The principles are documented independently from implementation status.
 
----
-
 ## Architectural Principles
 
 1. **FOSS-first**
@@ -154,15 +152,20 @@ The principles are documented independently from implementation status.
 8. **Documentation as code**
 9. **Practicality**
 10. **Reproducibility**
+11. **Evidence-driven architecture decisions**
+12. **Explicit trade-offs**
+13. **Measured performance and capacity**
 
 These are design principles; their presence in this document does not mean every related capability has already been implemented.
-
----
 
 ## Related Documentation
 
 | Documentation | Description |
 |---|---|
+| [Architecture Decision & Trade-off Methodology](architecture-decisions.md) | Decision and trade-off method |
+| [Cache Architecture](cache.md) | Cache design and Redis usage |
+| [Bottleneck Analysis](bottleneck-analysis.md) | Performance and constraint analysis |
+| [Asynchronous Architecture & Queue Decision Guide](async-architecture.md) | Criteria for future queue adoption |
 | [`../network/network.md`](../network/network.md) | Network architecture and segmentation |
 | [`../security/security.md`](../security/security.md) | Security architecture and controls |
 | [`../vm-design/vm-design.md`](../vm-design/vm-design.md) | VM design standards |
