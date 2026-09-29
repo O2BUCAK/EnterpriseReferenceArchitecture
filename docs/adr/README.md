@@ -14,6 +14,7 @@ Architecture Decision Records capture durable decisions that shape the reference
 | [0006](0006-openbao-secrets.md) | OpenBao for secrets management |
 | [0007](0007-centralized-postgresql.md) | Centralized PostgreSQL |
 | [0008](0008-single-app-host.md) | Single application host for the current lab |
+| [0009](0009-centralized-redis-cache.md) | Centralized Redis for explicit cache dependencies |
 
 ## Decision Methodology
 
