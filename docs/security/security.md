@@ -201,6 +201,27 @@ These are architectural objectives. They should not be presented as completed ca
 
 ---
 
+
+## Repository / SDLC Security — Planned
+
+Security controls also apply to the repository itself:
+
+- Git governance and protected integration branch
+- Signed commits
+- CI security gates
+- Secret scanning at pre-commit and CI stages
+- Dependency and version governance
+- SBOM and FOSS inventory
+- Automated documentation validation
+- Security-test evidence
+- IaC security validation when Ansible/OpenTofu implementation begins
+
+See [Security Policy](../../SECURITY.md), [Git Governance](../governance/git-governance.md), [Supply Chain](supply-chain.md), [FOSS Inventory](foss-inventory.md), and [Security Validation](security-testing.md).
+
+### Backup / DR Scope Boundary
+
+Backup and disaster recovery remain intentionally outside the current laboratory validation scope because of the available hardware. They must not be represented as implemented or validated controls until the project scope and hardware constraints change.
+
 ## Summary
 
 The security documentation intentionally separates **security design** from **security implementation**.
