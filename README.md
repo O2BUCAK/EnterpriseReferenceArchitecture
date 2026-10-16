@@ -277,6 +277,21 @@ For larger changes, open an issue first to discuss the proposed approach.
 
 ---
 
+### Repository Security & Supply Chain
+
+The repository also maintains security governance for the software-development lifecycle:
+
+- Git governance and protected-branch policy
+- CI security gates and automated secret scanning
+- Pre-commit secret scanning
+- Dependency review and version governance
+- SBOM / FOSS inventory
+- Automated documentation validation
+- Security-test evidence requirements
+- IaC security standards for the future Ansible/OpenTofu phase
+
+See [Security Policy](SECURITY.md), [Git Governance](docs/governance/git-governance.md), [Software Supply Chain](docs/security/supply-chain.md), [FOSS Inventory](docs/security/foss-inventory.md), and [Security Validation](docs/security/security-testing.md).
+
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
